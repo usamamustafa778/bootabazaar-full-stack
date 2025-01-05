@@ -3,6 +3,7 @@ import { assets } from "../assets/assets";
 
 const Footer = () => {
   return (
+    <>
     <div>
       <div className="flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10 mt-40 text-sm">
         <div>
@@ -34,13 +35,17 @@ const Footer = () => {
         </div>
       </div>
 
-      <div>
+     
+    </div>
+
+    <div className="w-full" >
         <hr />
-        <p className="py-5 text-sm text-center">
+        <p className="py-5 text-lg font-bold text-white text-center w-full bg-secondary">
           Copyright 2024@ bootabazaar.com - All Right Reserved.
         </p>
       </div>
-    </div>
+    </>
+
   );
 };
 

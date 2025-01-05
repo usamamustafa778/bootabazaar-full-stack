@@ -11,26 +11,32 @@ const Orders = ({ token }) => {
   const [orders, setOrders] = useState([])
 
   const fetchAllOrders = async () => {
-
     if (!token) {
+      toast.error("Authorization token is missing");
       return null;
     }
-
+  
     try {
-
-      const response = await axios.post(backendUrl + '/api/order/list', {}, { headers: { token } })
+      const response = await axios.post(
+        `${backendUrl}/api/order/list`, // Ensure URL is correctly formatted
+        {}, // POST request body (if required, pass data here)
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Correct usage of the token
+          },
+        }
+      );
+  
       if (response.data.success) {
-        setOrders(response.data.orders.reverse())
+        setOrders(response.data.orders.reverse());
       } else {
-        toast.error(response.data.message)
+        toast.error(response.data.message);
       }
-
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.response?.data?.message || "An error occurred while fetching orders");
     }
-
-
-  }
+  };
+  
 
   const statusHandler = async ( event, orderId ) => {
     try {
@@ -48,6 +54,7 @@ const Orders = ({ token }) => {
     fetchAllOrders();
   }, [token])
 
+  console.log("token" , token)
   return (
     <div>
       <h3>Order Page</h3>

@@ -7,8 +7,12 @@ import userModel from "../models/userModel.js";
 
 const router = express.Router();
 
-const createToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET);
+const createToken = (id, role, vendorId) => {
+  return jwt.sign(
+    { id, role, vendorId }, // Include additional fields in the payload
+    process.env.JWT_SECRET,
+    { expiresIn: '1h' } // Set an expiration time for security
+  );
 };
 
 export const loginUser = expressAsyncHandler(async (req, res) => {
@@ -30,7 +34,7 @@ export const loginUser = expressAsyncHandler(async (req, res) => {
       .json({ success: false, message: "Invalid credentials" });
   }
 
-  const token = createToken(user._id);
+  const token = createToken(user._id,user.role, user.vendorId);
 
   // Respond with user data and token
   res.status(200).json({
@@ -41,6 +45,7 @@ export const loginUser = expressAsyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role, // Include role in response
+      vendorId: user.vendorId,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     },

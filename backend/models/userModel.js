@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "vendor", "admin"],
       default: "user",
     },
+    vendorId: { type: String },
   },
   { minimize: false }
 );

@@ -1,17 +1,65 @@
 import mongoose from "mongoose";
+import slugify from "slugify";
 
 const productSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    description: { type: String, required: true },
-    price: { type: Number, required: true },
-    image: { type: Array, required: true },
-    category: { type: String, required: true },
-    subCategory: { type: String, required: true },
-    sizes: { type: Array, required: true },
-    bestseller: { type: Boolean },
-    date: { type: Number, required: true }
-})
+  name: {
+    type: String,
+    required: true,
+  },
 
-const productModel  = mongoose.models.product || mongoose.model("product",productSchema);
+  slug: {
+    unique: true,
+    type: String,
+  },
 
-export default productModel
+  description: {
+    type: String,
+    required: true,
+  },
+  vendor: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Vendor",
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  image:
+    // [String],
+    {
+      type: Array,
+      // required: true,
+    },
+  category: {
+    type: String,
+    // required: true,
+  },
+  subCategory: {
+    type: String,
+    // required: true,
+  },
+  sizes: {
+    type: Array,
+    // required: true,
+  },
+  bestseller: {
+    type: Boolean,
+  },
+  date: {
+    type: Number,
+    // required: true,
+  },
+});
+
+productSchema.pre("save", async function (next) {
+  if (this.name && !this.slug) {
+    this.slug = slugify(this.name.toLowerCase(), { strict: true });
+  }
+  next();
+});
+
+const productModel =
+  mongoose.models.product || mongoose.model("product", productSchema);
+
+export default productModel;

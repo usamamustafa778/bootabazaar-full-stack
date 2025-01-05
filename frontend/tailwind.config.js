@@ -5,7 +5,20 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors:{
+        primary:"#16A34A",
+        secondary:"#065F46",
+      },
+      backgroundImage: {
+        connect: "url(/img/connect.jpeg)",
+        
+      },
+      gridTemplateColumns: {
+        accordian: "1fr 30px",
+      
+      },
+    },
   },
   plugins: [],
 }

@@ -1,12 +1,12 @@
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { Container, Divider, FullContainer } from "..";
+import Container from "./Container";
+import Divider from "./Divider"
 
-export default function index({ options }) {
+export default function Accordian({ options }) {
   return (
-    <FullContainer className="mt-5">
-      <Container className="text-gray-900">
+      <Container className="text-gray-900 mt-5 mx-auto max-w-[1300px]  ">
         <h2 className="elementHeading2 mb-2 text-center">
           Frequently Asked Questions
         </h2>
@@ -52,6 +52,5 @@ export default function index({ options }) {
           })}
         </div>
       </Container>
-    </FullContainer>
   );
 }

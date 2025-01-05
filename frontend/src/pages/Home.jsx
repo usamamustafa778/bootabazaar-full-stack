@@ -4,13 +4,20 @@ import LatestCollection from "../components/LatestCollection";
 import BestSeller from "../components/BestSeller";
 import OurPolicy from "../components/OurPolicy";
 import NewsletterBox from "../components/NewsletterBox";
-import AboutUs from "../components/homepagesections/AboutUs";
+// import AboutUs from "../components/homepagesections/AboutUs";
+import HomeAboutUs from "../components/HomeAboutUs";
+import Connect from "../components/Connect";
+import { faqs } from "../../localData";
+import Accordian from "../components/common/Accordian";
 
 const Home = () => {
   return (
     <div>
       <Hero />
+      <HomeAboutUs/>
       <LatestCollection />
+      <Connect/>
+      <Accordian options={faqs} />
       <BestSeller />
       <OurPolicy />
       {/* <AboutUs /> */}

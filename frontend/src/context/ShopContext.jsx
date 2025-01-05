@@ -23,7 +23,11 @@ const ShopContextProvider = (props) => {
     } else {
       cartData[itemId] = 1;
     }
-
+    console.log("Token:", token);
+    if (!token) {
+      toast.error("You need to log in to add items to the cart.");
+      return;
+    }
     setCartItems(cartData);
     if (token) {
       try {
