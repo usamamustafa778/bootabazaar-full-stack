@@ -15,10 +15,11 @@ const Login = () => {
     event.preventDefault();
     try {
       if (currentState === "Sign Up") {
-        const response = await axios.post(backendUrl + "/api/user/register", {
+        const response = await axios.post(`${backendUrl}/api/user/register`, {
           name,
           email,
           password,
+          role: "user",
         });
         if (response.data.success) {
           setToken(response.data.token);
@@ -36,6 +37,7 @@ const Login = () => {
           setToken(response.data.token);
           toast.success("You are logged in.");
           localStorage.setItem("token", response.data.token);
+          localStorage.setItem("user", JSON.stringify(response.data.user));
         } else {
           toast.error(response.data.message);
         }

@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/assets";
 import RelatedProducts from "../components/RelatedProducts";
+import { FaStar, FaRegStar, FaShoppingCart, FaTruck, FaUndo, FaShieldAlt } from "react-icons/fa";
 
 const Product = () => {
   const { productId } = useParams();
@@ -10,6 +11,7 @@ const Product = () => {
   const [productData, setProductData] = useState(false);
   const [image, setImage] = useState("");
   const [size, setSize] = useState("");
+  const [activeTab, setActiveTab] = useState("description");
 
   const fetchProductData = async () => {
     products.map((item) => {
@@ -25,112 +27,177 @@ const Product = () => {
     fetchProductData();
   }, [productId, products]);
 
- 
   return productData ? (
-    <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
-      {/*----------- Product Data-------------- */}
-      <div className="flex gap-12 sm:gap-12 flex-col sm:flex-row">
-        {/*---------- Product Images------------- */}
-        <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
-          <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full">
-            {productData.image.map((item, index) => (
-              <img
-                onClick={() => setImage(item)}
-                src={item}
-                key={index}
-                className="w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer"
-                alt=""
-              />
-            ))}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Product Overview Section */}
+      <div className="flex flex-col lg:flex-row gap-12">
+        {/* Image Gallery */}
+        <div className="flex-1 flex flex-col gap-4">
+          {/* Main Image */}
+          <div className="w-full aspect-square rounded-lg overflow-hidden bg-gray-100">
+            <img
+              src={image}
+              alt={productData.name}
+              className="w-full h-full object-cover"
+            />
           </div>
-          <div className="w-full sm:w-[80%]">
-            <img className="w-full h-auto" src={image} alt="" />
+
+          {/* Thumbnails */}
+          <div className="flex gap-4 overflow-x-auto pb-2">
+            {productData.image.map((item, index) => (
+              <button
+                key={index}
+                onClick={() => setImage(item)}
+                className={`flex-shrink-0 border-2 rounded-lg overflow-hidden transition-all ${
+                  image === item ? "border-green-500" : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                <img
+                  src={item}
+                  alt={`${productData.name} - view ${index + 1}`}
+                  className="w-20 h-20 object-cover"
+                />
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* -------- Product Info ---------- */}
-        <div className="flex-1">
-          <h1 className="font-medium text-2xl mt-2">{productData.name}</h1>
-          <div className=" flex items-center gap-1 mt-2">
-            <img src={assets.star_icon} alt="" className="w-3 5" />
-            <img src={assets.star_icon} alt="" className="w-3 5" />
-            <img src={assets.star_icon} alt="" className="w-3 5" />
-            <img src={assets.star_icon} alt="" className="w-3 5" />
-            <img src={assets.star_dull_icon} alt="" className="w-3 5" />
-            <p className="pl-2">(122)</p>
+        {/* Product Info */}
+        <div className="flex-1 space-y-6">
+          <h1 className="text-3xl font-bold text-gray-900">{productData.name}</h1>
+          
+          {/* Rating */}
+          <div className="flex items-center gap-2">
+            <div className="flex text-yellow-400">
+              {[...Array(5)].map((_, index) => (
+                index < 4 ? <FaStar key={index} /> : <FaRegStar key={index} />
+              ))}
+            </div>
+            <span className="text-gray-500">(122 reviews)</span>
           </div>
-          <p className="mt-5 text-3xl font-medium">
+
+          {/* Price */}
+          <div className="text-4xl font-bold text-gray-900">
             {currency}
             {productData.price}
-          </p>
-          <p className="mt-5 text-gray-500 md:w-4/5">
+          </div>
+
+          {/* Description */}
+          <p className="text-gray-600 leading-relaxed">
             {productData.description}
           </p>
-          <div className="flex flex-col gap-4 my-8">
-            <p>Select Size</p>
-            <div className="flex gap-2">
+
+          {/* Size Selection */}
+          <div className="space-y-4">
+            <h3 className="font-medium text-gray-900">Select Size</h3>
+            <div className="flex flex-wrap gap-3">
               {productData.sizes.map((item, index) => (
                 <button
-                  onClick={() => setSize(item)}
-                  className={`border py-2 px-4 bg-gray-100 ${
-                    item === size ? "border-orange-500" : ""
-                  }`}
                   key={index}
+                  onClick={() => setSize(item)}
+                  className={`px-6 py-2 rounded-lg transition-all ${
+                    item === size
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-100 hover:bg-gray-200 text-gray-800"
+                  }`}
                 >
                   {item}
                 </button>
               ))}
             </div>
           </div>
+
+          {/* Add to Cart Button */}
           <button
             onClick={() => addToCart(productData._id, size)}
-            className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700"
+            disabled={!size}
+            className={`w-full py-4 px-8 rounded-lg flex items-center justify-center gap-2 text-white font-medium transition-all ${
+              size
+                ? "bg-green-500 hover:bg-green-600"
+                : "bg-gray-300 cursor-not-allowed"
+            }`}
           >
-            ADD TO CART
+            <FaShoppingCart />
+            Add to Cart
           </button>
-          <hr className="mt-8 sm:w-4/5" />
-          <div className="text-sm text-gray-500 mt-5 flex flex-col gap-1">
-            <p>100% Original product.</p>
-            <p>Cash on delivery is available on this product.</p>
-            <p>Easy return and exchange policy within 7 days.</p>
+
+          {/* Features */}
+          <div className="grid grid-cols-2 gap-4 pt-6 border-t">
+            <div className="flex items-center gap-3">
+              <FaTruck className="text-gray-400 text-xl" />
+              <div>
+                <p className="font-medium">Free Delivery</p>
+                <p className="text-sm text-gray-500">For orders above $50</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <FaUndo className="text-gray-400 text-xl" />
+              <div>
+                <p className="font-medium">Easy Returns</p>
+                <p className="text-sm text-gray-500">7 days return policy</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ---------- Description & Review Section ------------- */}
-      <div className="mt-20">
-        <div className="flex">
-          <b className="border px-5 py-3 text-sm">Description</b>
-          <p className="border px-5 py-3 text-sm">Reviews (122)</p>
+      {/* Product Details Tabs */}
+      <div className="mt-16">
+        <div className="flex border-b">
+          <button
+            onClick={() => setActiveTab("description")}
+            className={`px-8 py-4 font-medium transition-all ${
+              activeTab === "description"
+                ? "border-b-2 border-green-500 text-green-500"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Description
+          </button>
+          <button
+            onClick={() => setActiveTab("reviews")}
+            className={`px-8 py-4 font-medium transition-all ${
+              activeTab === "reviews"
+                ? "border-b-2 border-green-500 text-green-500"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Reviews (122)
+          </button>
         </div>
-        <div className="flex flex-col gap-4 border px-6 py-6 text-sm text-gray-500">
-          <p>
-            An e-commerce website is an online platform that facilitates the
-            buying and selling of products or services over the internet. It
-            serves as a virtual marketplace where businesses and individuals can
-            showcase their products, interact with customers, and conduct
-            transactions without the need for a physical presence. E-commerce
-            websites have gained immense popularity due to their convenience,
-            accessibility, and the global reach they offer.
-          </p>
-          <p>
-            E-commerce websites typically display products or services along
-            with detailed descriptions, images, prices, and any available
-            variations (e.g., sizes, colors). Each product usually has its own
-            dedicated page with relevant information.
-          </p>
+        
+        <div className="py-8">
+          {activeTab === "description" ? (
+            <div className="prose max-w-none">
+              <p className="text-gray-600 leading-relaxed">
+                {productData.description}
+              </p>
+              <p className="text-gray-600 leading-relaxed mt-4">
+                Our products are carefully selected to ensure the highest quality
+                and customer satisfaction. Each item undergoes rigorous quality
+                control before being made available for purchase.
+              </p>
+            </div>
+          ) : (
+            <div className="text-gray-600">
+              Reviews content will be displayed here...
+            </div>
+          )}
         </div>
       </div>
 
-      {/* --------- display related products ---------- */}
-
-      <RelatedProducts
-        category={productData.category}
-        subCategory={productData.subCategory}
-      />
+      {/* Related Products */}
+      <div className="mt-16">
+        <RelatedProducts
+          category={productData.category}
+          subCategory={productData.subCategory}
+        />
+      </div>
     </div>
   ) : (
-    <div className=" opacity-0"></div>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-500 border-t-transparent"></div>
+    </div>
   );
 };
 

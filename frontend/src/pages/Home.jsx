@@ -4,7 +4,6 @@ import LatestCollection from "../components/LatestCollection";
 import BestSeller from "../components/BestSeller";
 import OurPolicy from "../components/OurPolicy";
 import NewsletterBox from "../components/NewsletterBox";
-// import AboutUs from "../components/homepagesections/AboutUs";
 import HomeAboutUs from "../components/HomeAboutUs";
 import Connect from "../components/Connect";
 import { faqs } from "../../localData";
@@ -14,13 +13,12 @@ const Home = () => {
   return (
     <div>
       <Hero />
-      <HomeAboutUs/>
+      <HomeAboutUs />
       <LatestCollection />
-      <Connect/>
-      <Accordian options={faqs} />
       <BestSeller />
       <OurPolicy />
-      {/* <AboutUs /> */}
+      <Connect />
+      <Accordian options={faqs} />
       <NewsletterBox />
     </div>
   );

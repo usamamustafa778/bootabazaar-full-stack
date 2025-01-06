@@ -1,38 +1,38 @@
 export const faqs = [
   {
-    question: "How does GreenScape Marketplace work?",
+    question: "How does Bootabazaar Marketplace work?",
     answer:
-      "GreenScape connects users with skilled gardeners for gardening services and offers a marketplace for buying and selling gardening products. Users can hire gardeners, explore product listings, and make purchases through the platform.",
+      "Bootabazaar connects users with skilled gardeners for gardening services and offers a marketplace for buying and selling gardening products. Users can hire gardeners, explore product listings, and make purchases through the platform.",
   },
   {
-    question: "Is GreenScape available in my area?",
+    question: "Is Bootabazaar available in my area?",
     answer:
       "We are continually expanding our network. Please enter your location during sign-up or product purchase to check for availability in your area.",
   },
   {
-    question: "How do I become a gardener on GreenScape?",
+    question: "How do I become a gardener on Bootabazaar?",
     answer:
       "To become a gardener, sign up as a service provider, create a compelling profile, and submit your credentials. Once approved, you can start offering your gardening services on the platform.",
   },
   {
-    question: "Can I trust the gardeners on GreenScape?",
+    question: "Can I trust the gardeners on Bootabazaar?",
     answer:
-      "Absolutely! GreenScape thoroughly vets all gardeners to ensure they have the necessary skills and qualifications. User reviews and ratings also help you make informed decisions when hiring a gardener.",
+      "Absolutely! Bootabazaar thoroughly vets all gardeners to ensure they have the necessary skills and qualifications. User reviews and ratings also help you make informed decisions when hiring a gardener.",
   },
   {
     question: "How do I pay for gardening services or products?",
     answer:
-      "GreenScape supports secure and convenient payment methods. You can use major credit cards, debit cards, or popular online payment gateways to pay for services and products.",
+      "Bootabazaar supports secure and convenient payment methods. You can use major credit cards, debit cards, or popular online payment gateways to pay for services and products.",
   },
   {
-    question: "Can I sell my gardening products on GreenScape?",
+    question: "Can I sell my gardening products on Bootabazaar?",
     answer:
-      "Certainly! GreenScape welcomes green entrepreneurs to sell their gardening products on the platform. Sign up as a seller, list your items, and connect with a broader community of gardening enthusiasts.",
+      "Certainly! Bootabazaar welcomes green entrepreneurs to sell their gardening products on the platform. Sign up as a seller, list your items, and connect with a broader community of gardening enthusiasts.",
   },
   {
-    question: "What types of gardening products are available on GreenScape?",
+    question: "What types of gardening products are available on Bootabazaar?",
     answer:
-      "GreenScape hosts an extensive selection of gardening products, including seeds, plants, soil, tools, equipment, and decorative items, among others.",
+      "Bootabazaar hosts an extensive selection of gardening products, including seeds, plants, soil, tools, equipment, and decorative items, among others.",
   },
   {
     question: "Is there a return policy for gardening products?",
@@ -40,15 +40,15 @@ export const faqs = [
       "Yes, we offer a hassle-free return policy for products that do not meet your expectations or arrive damaged. Please review our Return and Refund Policy for more details.",
   },
   {
-    question: "How can I contact GreenScape customer support?",
+    question: "How can I contact Bootabazaar customer support?",
     answer:
       "Our dedicated customer support team is here to assist you. Simply visit our Contact Us page on the website or app and reach out with any queries or concerns.",
   },
   {
     question:
-      "What sets GreenScape apart from other gardening services and marketplaces?",
+      "What sets Bootabazaar apart from other gardening services and marketplaces?",
     answer:
-      "GreenScape stands out for its unique combination of on-demand gardening services and an extensive marketplace for gardening products. Our platform caters to all your gardening needs under one roof.",
+      "Bootabazaar stands out for its unique combination of on-demand gardening services and an extensive marketplace for gardening products. Our platform caters to all your gardening needs under one roof.",
   },
 ];
 

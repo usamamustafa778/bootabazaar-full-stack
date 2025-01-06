@@ -3,42 +3,42 @@ import userModel from "../models/userModel.js";
 import Stripe from "stripe";
 import razorpay from "razorpay";
 
-// global variables
-const currency = "inr";
-const deliveryCharge = 10;
+const CONFIG = {
+  currency: "inr",
+  deliveryCharge: 10,
+};
 
-// gateway initialize
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 const razorpayInstance = new razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// Placing orders using COD Method
+const createOrderData = (userId, items, amount, address, paymentMethod) => ({
+  userId,
+  items,
+  address,
+  amount,
+  paymentMethod,
+  payment: false,
+  date: Date.now(),
+});
+
+const clearUserCart = async (userId) => {
+  await userModel.findByIdAndUpdate(userId, { cartData: {} });
+};
+
 const placeOrder = async (req, res) => {
   try {
     const { userId, items, amount, address } = req.body;
+    const orderData = createOrderData(userId, items, amount, address, "COD");
 
-    const orderData = {
-      userId,
-      items,
-      address,
-      amount,
-      paymentMethod: "COD",
-      payment: false,
-      date: Date.now(),
-    };
-
-    const newOrder = new orderModel(orderData);
-    await newOrder.save();
-
-    await userModel.findByIdAndUpdate(userId, { cartData: {} });
+    const newOrder = await orderModel.create(orderData);
+    await clearUserCart(userId);
 
     res.json({ success: true, message: "Order Placed" });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -63,7 +63,7 @@ const placeOrderStripe = async (req, res) => {
 
     const line_items = items.map((item) => ({
       price_data: {
-        currency: currency,
+        currency: CONFIG.currency,
         product_data: {
           name: item.name,
         },
@@ -74,11 +74,11 @@ const placeOrderStripe = async (req, res) => {
 
     line_items.push({
       price_data: {
-        currency: currency,
+        currency: CONFIG.currency,
         product_data: {
           name: "Delivery Charges",
         },
-        unit_amount: deliveryCharge * 100,
+        unit_amount: CONFIG.deliveryCharge * 100,
       },
       quantity: 1,
     });
@@ -103,16 +103,17 @@ const verifyStripe = async (req, res) => {
 
   try {
     if (success === "true") {
-      await orderModel.findByIdAndUpdate(orderId, { payment: true });
-      await userModel.findByIdAndUpdate(userId, { cartData: {} });
-      res.json({ success: true });
-    } else {
-      await orderModel.findByIdAndDelete(orderId);
-      res.json({ success: false });
+      await Promise.all([
+        orderModel.findByIdAndUpdate(orderId, { payment: true }),
+        clearUserCart(userId),
+      ]);
+      return res.json({ success: true });
     }
+
+    await orderModel.findByIdAndDelete(orderId);
+    res.json({ success: false });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -136,7 +137,7 @@ const placeOrderRazorpay = async (req, res) => {
 
     const options = {
       amount: amount * 100,
-      currency: currency.toUpperCase(),
+      currency: CONFIG.currency.toUpperCase(),
       receipt: newOrder._id.toString(),
     };
 
@@ -182,58 +183,27 @@ const allOrders = async (req, res) => {
   }
 };
 
-// const getVendorOrders = async (req, res) => {
-//   try {
-//     const { vendorId } = req.params;
-// const {role}=req.user;
-
-//     // Check if the user is authorized
-//     if (req.user.vendorId !== vendorId || req.user.role !== "vendor") {
-//       return res
-//         .status(403)
-//         .json({ success: false, message: "Access Denied " });
-//     }
-
-//     const orders = await orderModel
-//       .find({ "cart.vendorId": vendorId })
-//       .sort({ createdAt: -1 });
-
-//     res.json({ success: true, orders });
-//   } catch (error) {
-//     console.error("Error fetching vendor orders:", error);
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
-
-
-
-
-
 const getVendorOrders = async (req, res) => {
   try {
-    const { vendorId } = req.params; // Vendor ID from the request parameters
-    const { role, vendorId: tokenVendorId } = req.user; // Extract role and vendorId from req.user (which is set by authUser middleware)
-    // Check if the user has the 'vendor' role and the vendorId matches
+    const { vendorId } = req.params;
+    const { role, vendorId: tokenVendorId } = req.user;
+
     if (role !== "vendor" || tokenVendorId !== vendorId) {
-      return res
-        .status(403)
-        .json({ success: false, message: "Access Denied. You do not have permission to view these orders." });
+      return res.status(403).json({
+        success: false,
+        message: "Access Denied",
+      });
     }
 
-    // Fetch orders that belong to the specific vendor
     const orders = await orderModel
       .find({ "cart.vendorId": vendorId })
       .sort({ createdAt: -1 });
 
     res.json({ success: true, orders });
   } catch (error) {
-    console.error("Error fetching vendor orders:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
-
-
 
 // User Order Data For Forntend
 const userOrders = async (req, res) => {

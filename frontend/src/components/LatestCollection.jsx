@@ -12,28 +12,31 @@ const LatestCollection = () => {
   }, [products]);
 
   return (
-    <div className="my-10">
-      <div className="text-center py-8 text-3xl">
+    <section className="container mx-auto px-4 py-16">
+      <div className="text-center max-w-2xl mx-auto mb-12">
         <Title text1={"LATEST"} text2={"COLLECTIONS"} />
-        <p className="w-3/4 m-auto text-xs sm:text-sm md:text-base text-gray-600">
-          Lorem Ipsum is simply dummy text of the printing and typesetting
-          industry. Lorem Ipsum has been the.
+        <p className="mt-4 text-gray-600 leading-relaxed">
+          Discover our newest arrivals, carefully curated for the modern
+          lifestyle. Each piece tells a story of quality and contemporary
+          design.
         </p>
       </div>
 
       {/* Rendering Products */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6 gap-y-8">
         {latestProducts.map((item, index) => (
-          <ProductItem
-            key={index}
-            id={item._id}
-            image={item.image}
-            name={item.name}
-            price={item.price}
-          />
+          <div className="transform transition-transform duration-300 hover:scale-105">
+            <ProductItem
+              key={index}
+              id={item._id}
+              image={item.image}
+              name={item.name}
+              price={item.price}
+            />
+          </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

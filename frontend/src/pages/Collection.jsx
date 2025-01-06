@@ -3,6 +3,7 @@ import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/assets";
 import Title from "../components/Title";
 import ProductItem from "../components/ProductItem";
+import { FaFilter, FaChevronDown } from "react-icons/fa";
 
 const Collection = () => {
   const { products, search, showSearch } = useContext(ShopContext);
@@ -77,243 +78,133 @@ const Collection = () => {
   }, [sortType]);
 
   return (
-    <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
-      {/* Filter Options */}
-      <div className="min-w-60">
-        <p
-          onClick={() => setShowFilter(!showFilter)}
-          className="my-2 text-xl flex items-center cursor-pointer gap-2"
+    <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8">
+        <Title text1={"ALL"} text2={"COLLECTIONS"} />
+        <select
+          onChange={(e) => setSortType(e.target.value)}
+          className="px-4 py-2 border border-gray-200 rounded-lg text-sm bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
         >
-          FILTERS
-          <img
-            className={`h-3 sm:hidden ${showFilter ? "rotate-90" : ""}`}
-            src={assets.dropdown_icon}
-            alt=""
-          />
-        </p>
-        {/* Category Filter */}
-        <div
-          className={`border border-gray-300 pl-5 py-3 mt-6 ${
-            showFilter ? "" : "hidden"
-          } sm:block`}
-        >
-          <p className="mb-3 text-sm font-medium">CATEGORIES</p>
-          <div className="flex flex-col gap-2 text-sm font-light text-gray-700">
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Plants"}
-                onChange={toggleCategory}
-              />{" "}
-              Plants
-            </p>
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Gardening Tools"}
-                onChange={toggleCategory}
-              />{" "}
-              Gardening Tools
-            </p>
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Pots and Containers"}
-                onChange={toggleCategory}
-              />{" "}
-              Pots and Containers
-            </p>
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Soil and Fertilizers"}
-                onChange={toggleCategory}
-              />{" "}
-              Soil and Fertilizers
-            </p>
-          </div>
-        </div>
-        {/* SubCategory Filter */}
-        <div
-          className={`border border-gray-300 pl-5 py-3 my-5 ${
-            showFilter ? "" : "hidden"
-          } sm:block`}
-        >
-          <p className="mb-3 text-sm font-medium">TYPE</p>
-          <div className="flex flex-col gap-2 text-sm font-light text-gray-700">
-            {/* Plants Subcategories */}
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Indoor Plants"}
-                onChange={toggleSubCategory}
-              />{" "}
-              Indoor Plants
-            </p>
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Outdoor Plants"}
-                onChange={toggleSubCategory}
-              />{" "}
-              Outdoor Plants
-            </p>
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Flowering Plants"}
-                onChange={toggleSubCategory}
-              />{" "}
-              Flowering Plants
-            </p>
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Succulents"}
-                onChange={toggleSubCategory}
-              />{" "}
-              Succulents
-            </p>
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Herbs"}
-                onChange={toggleSubCategory}
-              />{" "}
-              Herbs
-            </p>
-            {/* Gardening Tools Subcategories */}
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Pruning Tools"}
-                onChange={toggleSubCategory}
-              />{" "}
-              Pruning Tools
-            </p>
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Watering Tools"}
-                onChange={toggleSubCategory}
-              />{" "}
-              Watering Tools
-            </p>
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Planting Tools"}
-                onChange={toggleSubCategory}
-              />{" "}
-              Planting Tools
-            </p>
-            {/* Pots and Containers Subcategories */}
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Plastic Pots"}
-                onChange={toggleSubCategory}
-              />{" "}
-              Plastic Pots
-            </p>
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Ceramic Pots"}
-                onChange={toggleSubCategory}
-              />{" "}
-              Ceramic Pots
-            </p>
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Hanging Pots"}
-                onChange={toggleSubCategory}
-              />{" "}
-              Hanging Pots
-            </p>
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Planters"}
-                onChange={toggleSubCategory}
-              />{" "}
-              Planters
-            </p>
-            {/* Soil and Fertilizers Subcategories */}
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Potting Soil"}
-                onChange={toggleSubCategory}
-              />{" "}
-              Potting Soil
-            </p>
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Organic Fertilizers"}
-                onChange={toggleSubCategory}
-              />{" "}
-              Organic Fertilizers
-            </p>
-            <p className="flex gap-2">
-              <input
-                className="w-3"
-                type="checkbox"
-                value={"Compost"}
-                onChange={toggleSubCategory}
-              />{" "}
-              Compost
-            </p>
-          </div>
-        </div>
+          <option value="relavent">Sort by: Relevant</option>
+          <option value="low-high">Sort by: Low to High</option>
+          <option value="high-low">Sort by: High to Low</option>
+        </select>
       </div>
 
-      {/* Right Side */}
-      <div className="flex-1">
-        <div className="flex justify-between text-base sm:text-2xl mb-4">
-          <Title text1={"ALL"} text2={"COLLECTIONS"} />
-          {/* Product Sort */}
-          <select
-            onChange={(e) => setSortType(e.target.value)}
-            className="border-2 border-gray-300 text-sm px-2"
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Filter Sidebar */}
+        <div className="w-full lg:w-64 flex-shrink-0">
+          {/* Mobile Filter Toggle */}
+          <button
+            onClick={() => setShowFilter(!showFilter)}
+            className="lg:hidden w-full flex items-center justify-between p-4 mb-4 bg-white rounded-lg shadow-sm"
           >
-            <option value="relavent">Sort by: Relevant</option>
-            <option value="low-high">Sort by: Low to High</option>
-            <option value="high-low">Sort by: High to Low</option>
-          </select>
+            <span className="flex items-center gap-2">
+              <FaFilter className="text-gray-600" />
+              <span className="font-medium">Filters</span>
+            </span>
+            <FaChevronDown
+              className={`transform transition-transform duration-200 ${
+                showFilter ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+
+          {/* Filter Content */}
+          <div
+            className={`${
+              showFilter ? "block" : "hidden"
+            } lg:block space-y-6 bg-white rounded-lg p-6 shadow-sm`}
+          >
+            {/* Categories */}
+            <div>
+              <h3 className="font-medium text-gray-900 mb-4">Categories</h3>
+              <div className="space-y-3">
+                {[
+                  "Plants",
+                  "Gardening Tools",
+                  "Pots and Containers",
+                  "Soil and Fertilizers",
+                ].map((item) => (
+                  <label
+                    key={item}
+                    className="flex items-center gap-3 cursor-pointer group"
+                  >
+                    <input
+                      type="checkbox"
+                      value={item}
+                      onChange={toggleCategory}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-gray-700 group-hover:text-gray-900">
+                      {item}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Subcategories */}
+            <div>
+              <h3 className="font-medium text-gray-900 mb-4">Type</h3>
+              <div className="space-y-3">
+                {[
+                  "Indoor Plants",
+                  "Outdoor Plants",
+                  "Flowering Plants",
+                  "Succulents",
+                  "Herbs",
+                  "Pruning Tools",
+                  "Watering Tools",
+                  "Planting Tools",
+                  "Plastic Pots",
+                  "Ceramic Pots",
+                  "Hanging Pots",
+                  "Planters",
+                  "Potting Soil",
+                  "Organic Fertilizers",
+                  "Compost",
+                ].map((item) => (
+                  <label
+                    key={item}
+                    className="flex items-center gap-3 cursor-pointer group"
+                  >
+                    <input
+                      type="checkbox"
+                      value={item}
+                      onChange={toggleSubCategory}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-gray-700 group-hover:text-gray-900">
+                      {item}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Map Products */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
-          {filterProducts.map((item, index) => (
-            <ProductItem
-              key={index}
-              name={item.name}
-              id={item._id}
-              price={item.price}
-              image={item.image}
-            />
-          ))}
+        {/* Products Grid */}
+        <div className="flex-1">
+          {filterProducts.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500">No products found matching your criteria.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filterProducts.map((item, index) => (
+                <ProductItem
+                  key={index}
+                  name={item.name}
+                  id={item._id}
+                  price={item.price}
+                  image={item.image}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

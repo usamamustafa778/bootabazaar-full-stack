@@ -42,8 +42,7 @@ const vendorSchema = new mongoose.Schema(
 
     slug: {
       type: String,
-      unique:true,
-
+      unique: true,
     },
 
     storeDescription: {
@@ -60,7 +59,6 @@ const vendorSchema = new mongoose.Schema(
       required: true,
     },
 
-
     isVerified: {
       type: Boolean,
       default: false,
@@ -73,9 +71,7 @@ const vendorSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
-
-vendorSchema.pre("save", async function(next) {
+vendorSchema.pre("save", async function (next) {
   this.slug = slugify(this.storeName.toLowerCase());
   next();
 });
