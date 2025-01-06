@@ -1,7 +1,6 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import Stripe from "stripe";
-import razorpay from "razorpay";
 
 const CONFIG = {
   currency: "inr",
@@ -9,10 +8,6 @@ const CONFIG = {
 };
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-const razorpayInstance = new razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
 
 const createOrderData = (userId, items, amount, address, paymentMethod) => ({
   userId,
@@ -117,61 +112,6 @@ const verifyStripe = async (req, res) => {
   }
 };
 
-// Placing orders using Razorpay Method
-const placeOrderRazorpay = async (req, res) => {
-  try {
-    const { userId, items, amount, address } = req.body;
-
-    const orderData = {
-      userId,
-      items,
-      address,
-      amount,
-      paymentMethod: "Razorpay",
-      payment: false,
-      date: Date.now(),
-    };
-
-    const newOrder = new orderModel(orderData);
-    await newOrder.save();
-
-    const options = {
-      amount: amount * 100,
-      currency: CONFIG.currency.toUpperCase(),
-      receipt: newOrder._id.toString(),
-    };
-
-    await razorpayInstance.orders.create(options, (error, order) => {
-      if (error) {
-        console.log(error);
-        return res.json({ success: false, message: error });
-      }
-      res.json({ success: true, order });
-    });
-  } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
-  }
-};
-
-const verifyRazorpay = async (req, res) => {
-  try {
-    const { userId, razorpay_order_id } = req.body;
-
-    const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id);
-    if (orderInfo.status === "paid") {
-      await orderModel.findByIdAndUpdate(orderInfo.receipt, { payment: true });
-      await userModel.findByIdAndUpdate(userId, { cartData: {} });
-      res.json({ success: true, message: "Payment Successful" });
-    } else {
-      res.json({ success: false, message: "Payment Failed" });
-    }
-  } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
-  }
-};
-
 // All Orders data for Admin Panel and Vendor
 const allOrders = async (req, res) => {
   try {
@@ -232,11 +172,9 @@ const updateStatus = async (req, res) => {
 };
 
 export {
-  verifyRazorpay,
   verifyStripe,
   placeOrder,
   placeOrderStripe,
-  placeOrderRazorpay,
   allOrders,
   userOrders,
   updateStatus,

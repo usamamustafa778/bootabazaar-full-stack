@@ -55,64 +55,109 @@ const Login = () => {
   }, [token]);
 
   return (
-    <form
-      onSubmit={onSubmitHandler}
-      className="flex flex-col items-center w-[90%] sm:max-w-96 m-auto mt-14 gap-4 text-gray-800"
-    >
-      <div className="inline-flex items-center gap-2 mb-2 mt-10">
-        <p className="prata-regular text-3xl">{currentState}</p>
-        <hr className="border-none h-[1.5px] w-8 bg-gray-800" />
+    <div className="flex items-center justify-center bg-gray-50 mt-24 px-4 sm:px-6 lg:px-8">
+      <div className="flex w-full max-w-5xl shadow-lg rounded-2xl overflow-hidden">
+        {/* Left side - Image */}
+        <div
+          className="hidden md:block w-1/2 bg-cover bg-center"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1470058869958-2a77ade41c02?q=80&w=2070&auto=format&fit=crop')`,
+          }}
+        >
+          <div className="h-full w-full bg-black bg-opacity-20 p-12 flex items-end">
+            <div className="text-white">
+              <h2 className="text-4xl font-bold mb-4">Welcome to PlantStore</h2>
+              <p className="text-lg">
+                Bring nature into your home with our curated collection
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right side - Form */}
+        <div className="w-full md:w-1/2 bg-white p-8">
+          <form onSubmit={onSubmitHandler} className="space-y-6">
+            <div className="text-center">
+              <h2 className="prata-regular text-3xl text-gray-900 mb-2">
+                {currentState}
+              </h2>
+              <p className="text-sm text-gray-600 mb-8">
+                {currentState === "Login"
+                  ? "Welcome back! Please enter your details"
+                  : "Create an account to get started"}
+              </p>
+            </div>
+
+            {currentState === "Sign Up" && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name
+                </label>
+                <input
+                  onChange={(e) => setName(e.target.value)}
+                  value={name}
+                  type="text"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:border-transparent"
+                  placeholder="Enter your name"
+                  required
+                />
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                onChange={(e) => setEmail(e.target.value)}
+                value={email}
+                type="email"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:border-transparent"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <input
+                onChange={(e) => setPasword(e.target.value)}
+                value={password}
+                type="password"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:border-transparent"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            <div className="flex items-center justify-between text-sm">
+              <p className="text-gray-600 hover:text-black cursor-pointer">
+                Forgot your password?
+              </p>
+              <p
+                onClick={() =>
+                  setCurrentState(
+                    currentState === "Login" ? "Sign Up" : "Login"
+                  )
+                }
+                className="text-gray-600 hover:text-black cursor-pointer"
+              >
+                {currentState === "Login" ? "Create account" : "Login Here"}
+              </p>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-secondary text-white py-3 rounded-lg hover:bg-primary transition-colors duration-200"
+            >
+              {currentState === "Login" ? "Sign In" : "Sign Up"}
+            </button>
+          </form>
+        </div>
       </div>
-      {currentState === "Login" ? (
-        ""
-      ) : (
-        <input
-          onChange={(e) => setName(e.target.value)}
-          value={name}
-          type="text"
-          className="w-full px-3 py-2 border border-gray-800"
-          placeholder="Name"
-          required
-        />
-      )}
-      <input
-        onChange={(e) => setEmail(e.target.value)}
-        value={email}
-        type="email"
-        className="w-full px-3 py-2 border border-gray-800"
-        placeholder="Email"
-        required
-      />
-      <input
-        onChange={(e) => setPasword(e.target.value)}
-        value={password}
-        type="password"
-        className="w-full px-3 py-2 border border-gray-800"
-        placeholder="Password"
-        required
-      />
-      <div className="w-full flex justify-between text-sm mt-[-8px]">
-        <p className=" cursor-pointer">Forgot your password?</p>
-        {currentState === "Login" ? (
-          <p
-            onClick={() => setCurrentState("Sign Up")}
-            className=" cursor-pointer"
-          >
-            Create account
-          </p>
-        ) : (
-          <p
-            onClick={() => setCurrentState("Login")}
-            className=" cursor-pointer"
-          >
-            Login Here
-          </p>
-        )}
-      </div>
-      <button className="bg-black text-white font-light px-8 py-2 mt-4">
-        {currentState === "Login" ? "Sign In" : "Sign Up"}
-      </button>
-    </form>
+    </div>
   );
 };
 

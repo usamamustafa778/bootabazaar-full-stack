@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -12,33 +12,340 @@ import {
   FaTools,
   FaHeadset,
 } from "react-icons/fa";
+import { ShopContext } from "../context/ShopContext";
+
+const LoginForm = ({ data, setData, onSubmit, loading, onSwitch }) => {
+  return (
+    <form onSubmit={onSubmit} className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-8">Welcome Back!</h2>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Email Address
+        </label>
+        <input
+          type="email"
+          value={data.email}
+          onChange={(e) => setData({ ...data, email: e.target.value })}
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          placeholder="you@example.com"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Password
+        </label>
+        <input
+          type="password"
+          value={data.password}
+          onChange={(e) => setData({ ...data, password: e.target.value })}
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          placeholder="Enter your password"
+          required
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        className={`w-full bg-secondary text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-semibold ${
+          loading ? "opacity-50 cursor-not-allowed" : ""
+        }`}
+      >
+        {loading ? "Signing in..." : "Sign In"}
+      </button>
+
+      <p className="text-center text-gray-600">
+        Don't have an account?{" "}
+        <button
+          type="button"
+          onClick={onSwitch}
+          className="text-secondary hover:text-green-700 font-medium"
+        >
+          Sign up here
+        </button>
+      </p>
+    </form>
+  );
+};
+
+const SignupForm = ({ data, setData, onSubmit, loading, onSwitch }) => {
+  return (
+    <form onSubmit={onSubmit} className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-8">Create Account</h2>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Full Name
+        </label>
+        <input
+          type="text"
+          value={data.name}
+          onChange={(e) => setData({ ...data, name: e.target.value })}
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          placeholder="John Doe"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Email Address
+        </label>
+        <input
+          type="email"
+          value={data.email}
+          onChange={(e) => setData({ ...data, email: e.target.value })}
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          placeholder="you@example.com"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Password
+        </label>
+        <input
+          type="password"
+          value={data.password}
+          onChange={(e) => setData({ ...data, password: e.target.value })}
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          placeholder="Create a password"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Confirm Password
+        </label>
+        <input
+          type="password"
+          value={data.confirmPassword}
+          onChange={(e) =>
+            setData({ ...data, confirmPassword: e.target.value })
+          }
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          placeholder="Confirm your password"
+          required
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        className={`w-full bg-secondary text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-semibold ${
+          loading ? "opacity-50 cursor-not-allowed" : ""
+        }`}
+      >
+        {loading ? "Creating Account..." : "Create Account"}
+      </button>
+
+      <p className="text-center text-gray-600">
+        Already have an account?{" "}
+        <button
+          type="button"
+          onClick={onSwitch}
+          className="text-secondary hover:text-green-700 font-medium"
+        >
+          Sign in here
+        </button>
+      </p>
+    </form>
+  );
+};
+
+const PersonalInfoForm = ({ data, setData, onSubmit, loading }) => {
+  const user = JSON.parse(localStorage.getItem("user")) || {};
+
+  return (
+    <form onSubmit={onSubmit} className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-8">
+        Personal Information
+      </h2>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Full Name
+        </label>
+        <input
+          type="text"
+          value={user.name}
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-100"
+          disabled
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Email Address
+        </label>
+        <input
+          type="email"
+          value={user.email}
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-100"
+          disabled
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        className={`w-full bg-secondary text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-semibold ${
+          loading ? "opacity-50 cursor-not-allowed" : ""
+        }`}
+      >
+        {loading ? "Updating..." : "Continue to Store Setup"}
+      </button>
+    </form>
+  );
+};
+
+const StoreForm = ({ data, setData, onSubmit, loading, onBack }) => {
+  return (
+    <form onSubmit={onSubmit} className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-8">
+        Store Information
+      </h2>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Store Name
+        </label>
+        <input
+          type="text"
+          value={data.storeName}
+          onChange={(e) => setData({ ...data, storeName: e.target.value })}
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          placeholder="Your Store Name"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Store Description
+        </label>
+        <textarea
+          value={data.storeDescription}
+          onChange={(e) =>
+            setData({ ...data, storeDescription: e.target.value })
+          }
+          rows="4"
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          placeholder="Describe your store"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Store Logo
+        </label>
+        <input
+          type="file"
+          onChange={(e) => setData({ ...data, storeImage: e.target.files[0] })}
+          className="w-full"
+          accept="image/*"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Store Banner
+        </label>
+        <input
+          type="file"
+          onChange={(e) => setData({ ...data, storeBanner: e.target.files[0] })}
+          className="w-full"
+          accept="image/*"
+        />
+      </div>
+
+      <div className="flex gap-4">
+        <button
+          type="button"
+          onClick={onBack}
+          className="w-1/3 bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors font-semibold"
+        >
+          Back
+        </button>
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-2/3 bg-secondary text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-semibold ${
+            loading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          {loading ? "Creating Store..." : "Create Store"}
+        </button>
+      </div>
+    </form>
+  );
+};
 
 const RegisterModal = ({ isOpen, onClose }) => {
-  const [formData, setFormData] = useState({
+  const { backendUrl, navigate } = useContext(ShopContext);
+  const token = localStorage.getItem("token");
+  const [step, setStep] = useState(1);
+  const [formType, setFormType] = useState(token ? "personal" : "login");
+  const [loading, setLoading] = useState(false);
+
+  // Form data state
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [signupData, setSignupData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
-  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const [personalData, setPersonalData] = useState({
+    name: "",
+    email: "",
+    role: "vendor",
+  });
+
+  const [storeData, setStoreData] = useState({
+    storeName: "",
+    storeDescription: "",
+    storeImage: null,
+    storeBanner: null,
+  });
+
+  // Handle login form
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${backendUrl}/api/user/login`,
+        loginData
+      );
+      if (response.data.success) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        toast.success("Login successful!");
+        setFormType("personal");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSubmit = async (e) => {
+  // Handle signup form
+  const handleSignupSubmit = async (e) => {
     e.preventDefault();
-
-    // Basic validation
-    if (!formData.name || !formData.email || !formData.password) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
+    if (signupData.password !== signupData.confirmPassword) {
       toast.error("Passwords don't match");
       return;
     }
@@ -46,129 +353,218 @@ const RegisterModal = ({ isOpen, onClose }) => {
     setLoading(true);
     try {
       const response = await axios.post(`${backendUrl}/api/user/register`, {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
+        name: signupData.name,
+        email: signupData.email,
+        password: signupData.password,
         role: "vendor",
       });
 
-      if (response.data) {
-        toast.success("Seller Registration Request Successful!");
-        onClose();
+      if (response.data.success) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        toast.success("Registration successful!");
+        setFormType("personal");
       }
     } catch (error) {
-      toast.error(
-        error.response?.data?.message ||
-          "Registration failed. Please try again."
-      );
+      toast.error(error.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle personal information form
+  const updateUserRole = async () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user || user.role !== "user") return true;
+
+    try {
+      const response = await axios.put(
+        `${backendUrl}/api/user/profile`,
+        {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: "vendor",
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            token: token,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        const updatedUser = { ...user, role: "vendor" };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        toast.success("Account upgraded to vendor successfully!");
+        return true;
+      }
+      return false;
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to upgrade account to vendor"
+      );
+      return false;
+    }
+  };
+
+  const handlePersonalSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const roleUpdateSuccess = await updateUserRole();
+    setLoading(false);
+
+    if (roleUpdateSuccess) {
+      setStep(2);
+    }
+  };
+
+  // Handle store information form
+  const handleStoreSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("storeName", storeData.storeName);
+      formDataToSend.append("storeDescription", storeData.storeDescription);
+      if (storeData.storeImage)
+        formDataToSend.append("storeImage", storeData.storeImage);
+      if (storeData.storeBanner)
+        formDataToSend.append("storeBanner", storeData.storeBanner);
+
+      const response = await axios.post(
+        `${backendUrl}/api/store/create`,
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            token: token,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("Store created successfully!");
+        onClose();
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to create store");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Render the appropriate form based on formType and step
+  const renderForm = () => {
+    if (step === 1) {
+      switch (formType) {
+        case "login":
+          return (
+            <LoginForm
+              data={loginData}
+              setData={setLoginData}
+              onSubmit={handleLoginSubmit}
+              loading={loading}
+              onSwitch={() => setFormType("signup")}
+            />
+          );
+        case "signup":
+          return (
+            <SignupForm
+              data={signupData}
+              setData={setSignupData}
+              onSubmit={handleSignupSubmit}
+              loading={loading}
+              onSwitch={() => setFormType("login")}
+            />
+          );
+        case "personal":
+          return (
+            <PersonalInfoForm
+              data={personalData}
+              setData={setPersonalData}
+              onSubmit={handlePersonalSubmit}
+              loading={loading}
+            />
+          );
+        default:
+          return null;
+      }
+    } else {
+      return (
+        <StoreForm
+          data={storeData}
+          setData={setStoreData}
+          onSubmit={handleStoreSubmit}
+          loading={loading}
+          onBack={() => setStep(1)}
+        />
+      );
+    }
+  };
+
+  const handleOutsideClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg max-w-md w-full p-6 relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      onClick={handleOutsideClick}
+    >
+      <div className="bg-white rounded-2xl max-w-4xl w-full relative overflow-hidden flex shadow-xl">
+        {/* Left side - Image and text */}
+        <div
+          className="hidden md:block w-1/2 bg-cover bg-center relative"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1470058869958-2a77ade41c02?ixlib=rb-4.0.3')`,
+          }}
         >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-
-        <h2 className="text-2xl font-bold mb-4">
-          Start Selling on Bootabazaar
-        </h2>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Business Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="Your Business Name"
-              required
-            />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-black/50 to-secondary/50">
+            <div className="p-8 text-white h-full flex flex-col justify-between">
+              <div>
+                <h3 className="text-2xl font-bold mb-4">Join our community</h3>
+                <p className="text-green-100">
+                  {step === 1
+                    ? "Join our community of plant sellers and reach customers worldwide."
+                    : "Almost there! Let's create your store profile."}
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-white/20 p-2 rounded-full">
+                    <FaChartBar className="w-5 h-5 text-white" />
+                  </div>
+                  <p className="text-sm text-white">
+                    Access to millions of customers
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="bg-white/20 p-2 rounded-full">
+                    <FaTools className="w-5 h-5 text-white" />
+                  </div>
+                  <p className="text-sm text-white">Powerful seller tools</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="bg-white/20 p-2 rounded-full">
+                    <FaHeadset className="w-5 h-5 text-white" />
+                  </div>
+                  <p className="text-sm text-white">24/7 Seller support</p>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="Create a password"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="Confirm your password"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full bg-secondary text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors font-semibold ${
-              loading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            {loading ? "Registering..." : "Register Now"}
-          </button>
-        </form>
-
-        <p className="mt-4 text-sm text-gray-600 text-center">
-          By registering, you agree to our Terms of Service and Privacy Policy
-        </p>
+        {/* Right side - Forms */}
+        <div className="w-full md:w-1/2 p-8">{renderForm()}</div>
       </div>
     </div>
   );
