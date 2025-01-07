@@ -11,6 +11,7 @@ const Add = () => {
   const token = localStorage.getItem("token");
   const [stores, setStores] = useState([]);
   const [selectedStore, setSelectedStore] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     const fetchStores = async () => {
@@ -97,6 +98,7 @@ const Add = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    setIsProcessing(true);
 
     try {
       const formData = new FormData();
@@ -169,18 +171,7 @@ const Add = () => {
 
       if (response.data.success) {
         toast.success(response.data.message);
-        if (slug) {
-          navigate("/dashboard/products");
-        } else {
-          setName("");
-          setDescription("");
-          setImage1(null);
-          setImage2(null);
-          setImage3(null);
-          setImage4(null);
-          setPrice("");
-          setStock("");
-        }
+        navigate("/dashboard/products");
       }
     } catch (error) {
       console.error("Upload Error Details:", {
@@ -211,6 +202,8 @@ const Add = () => {
       } else {
         toast.error(`Error: ${error.response?.data?.message || error.message}`);
       }
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -373,8 +366,12 @@ const Add = () => {
 
       <button
         type="submit"
-        className="ml-auto w-fit px-10 py-2 bg-primary text-white font-medium rounded-lg hover:bg-secondary transition-all"
+        disabled={isProcessing}
+        className="ml-auto w-fit px-10 py-2 bg-primary text-white font-medium rounded-lg hover:bg-secondary transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
       >
+        {isProcessing && (
+          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+        )}
         {slug ? "Update Product" : "Add Product"}
       </button>
     </form>

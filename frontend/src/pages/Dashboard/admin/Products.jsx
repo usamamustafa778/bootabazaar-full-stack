@@ -133,11 +133,11 @@ export default function Products() {
                 <div className="space-y-1">
                   <div className="font-medium text-gray-800 flex items-center gap-2">
                     <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
-                      {product.images && product.images[0] ? (
+                      {product.image ? (
                         <img
-                          src={product.images[0]}
+                          src={product.image[0] || product.image}
                           alt={product.name}
-                          className="w-full h-full object-cover rounded-lg"
+                          className="w-full border border-gray-200 h-full object-cover rounded-lg"
                         />
                       ) : (
                         <FaBox className="text-gray-400 text-xl" />

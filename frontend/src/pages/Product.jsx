@@ -13,7 +13,7 @@ import {
 import RelatedProducts from "../components/RelatedProducts";
 
 const Product = () => {
-  const { productSlug } = useParams();
+  const { slug } = useParams();
   const [productData, setProductData] = useState(false);
   const [image, setImage] = useState("");
   const [activeTab, setActiveTab] = useState("description");
@@ -53,10 +53,11 @@ const Product = () => {
   const fetchProductData = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:4000/api/product/slug/${productSlug}`
+        `http://localhost:4000/api/product/${slug}`
       );
-      if (response.data.success) {
+      if (response.data.status) {
         setProductData(response.data.product);
+        console.log(response.data.product);
         setImage(response.data.product.image[0]);
       }
     } catch (error) {
@@ -67,9 +68,9 @@ const Product = () => {
 
   useEffect(() => {
     fetchProductData();
-  }, [productSlug]);
+  }, [slug]);
 
-  return productData ? (
+  return productData?.name ? (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Product Overview Section */}
       <div className="flex flex-col lg:flex-row gap-12">
@@ -135,7 +136,7 @@ const Product = () => {
           {/* Add to Cart Button */}
           <button
             onClick={addToCart}
-            className="w-full py-4 px-8 rounded-lg flex items-center justify-center gap-2 text-white font-medium transition-all bg-green-500 hover:bg-green-600"
+            className="w-full py-4 px-8 rounded-lg flex items-center justify-center gap-2 text-white font-medium transition-all bg-secondary hover:bg-primary"
           >
             <FaShoppingCart />
             Add to Cart
