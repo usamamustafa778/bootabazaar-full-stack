@@ -28,7 +28,7 @@ const LatestCollection = () => {
           <div className="transform transition-transform duration-300 hover:scale-105">
             <ProductItem
               key={index}
-              id={item._id}
+              slug={item.slug}
               image={item.image}
               name={item.name}
               price={item.price}

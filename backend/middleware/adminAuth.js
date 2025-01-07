@@ -1,12 +1,10 @@
 import jwt from "jsonwebtoken";
 
 const adminAuth = (req, res, next) => {
+  console.log("Function adminAuth called");
   try {
-    console.log("Authorization Header:", req.headers.authorization || "Not provided");
-
     const authHeader = req.headers.authorization;
 
-    // Check if Authorization header exists
     if (!authHeader) {
       console.error("Authorization header missing.");
       return res.status(403).json({
@@ -15,7 +13,6 @@ const adminAuth = (req, res, next) => {
       });
     }
 
-    // Check if Authorization header follows the Bearer format
     if (!authHeader.startsWith("Bearer ")) {
       console.error("Invalid Authorization header format.");
       return res.status(403).json({
@@ -24,7 +21,7 @@ const adminAuth = (req, res, next) => {
       });
     }
 
-    // Extract the token
+    // Extract the tokenj
     const token = authHeader.split(" ")[1];
     console.log("Extracted Token:", token);
 

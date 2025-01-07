@@ -17,29 +17,41 @@ const ShopContextProvider = (props) => {
   const navigate = useNavigate();
 
   const addToCart = async (itemId) => {
-    let cartData = { ...cartItems };
-    if (cartData[itemId]) {
-      cartData[itemId] += 1;
-    } else {
-      cartData[itemId] = 1;
-    }
-    console.log("Token:", token);
     if (!token) {
       toast.error("You need to log in to add items to the cart.");
       return;
     }
-    setCartItems(cartData);
-    if (token) {
-      try {
-        await axios.post(
-          backendUrl + "/api/cart/add",
-          { itemId },
-          { headers: { token } }
-        );
-      } catch (error) {
-        console.log(error);
-        toast.error(error.message);
+
+    let cartData = { ...cartItems };
+    if (cartData[itemId]) {
+      cartData[itemId] = cartData[itemId] + 1;
+    } else {
+      cartData[itemId] = 1;
+    }
+
+    try {
+      const response = await axios.post(
+        `${backendUrl}/api/cart/add`,
+        {
+          itemId,
+          userId: token,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setCartItems(cartData);
+      } else {
+        toast.error(response.data.message || "Failed to add item to cart");
       }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Error adding item to cart");
     }
   };
 
@@ -53,43 +65,52 @@ const ShopContextProvider = (props) => {
     return totalCount;
   };
 
-  const updateQuantity = async (itemId, size, quantity) => {
-    let cartData = structuredClone(cartItems);
-
-    if (quantity > 0) {
-      if (!cartData[itemId]) cartData[itemId] = {}; // Ensure itemId exists
-      cartData[itemId][size] = quantity;
-    } else {
-      delete cartData[itemId][size];
-      if (Object.keys(cartData[itemId]).length === 0) delete cartData[itemId];
+  const updateQuantity = async (itemId, quantity) => {
+    if (!token) {
+      toast.error("You need to log in to update cart.");
+      return;
     }
 
-    setCartItems(cartData);
+    let cartData = structuredClone(cartItems);
 
-    if (token) {
-      try {
-        await axios.post(
-          backendUrl + "/api/cart/update",
-          { itemId, size, quantity },
-          { headers: { token } }
-        );
-      } catch (error) {
-        console.log(error);
-        toast.error(error.message);
+    try {
+      const response = await axios.post(
+        `${backendUrl}/api/cart/update`,
+        {
+          itemId,
+          quantity,
+          userId: token,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data.success) {
+        if (quantity > 0) {
+          cartData[itemId] = quantity;
+        } else {
+          delete cartData[itemId];
+        }
+        setCartItems(cartData);
+      } else {
+        toast.error(response.data.message || "Failed to update cart");
       }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Error updating cart");
     }
   };
 
   const getCartAmount = () => {
     let totalAmount = 0;
-    for (const items in cartItems) {
-      let itemInfo = products.find((product) => product._id === items);
-      for (const item in cartItems[items]) {
-        try {
-          if (cartItems[items][item] > 0) {
-            totalAmount += itemInfo.price * cartItems[items][item];
-          }
-        } catch (error) {}
+    for (const itemId in cartItems) {
+      let itemInfo = products.find((product) => product._id === itemId);
+      if (itemInfo && cartItems[itemId] > 0) {
+        totalAmount += itemInfo.price * cartItems[itemId];
       }
     }
     return totalAmount;
@@ -112,16 +133,23 @@ const ShopContextProvider = (props) => {
   const getUserCart = async (token) => {
     try {
       const response = await axios.post(
-        backendUrl + "/api/cart/get",
-        {},
-        { headers: { token } }
+        `${backendUrl}/api/cart/get`,
+        {
+          userId: token,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
       if (response.data.success) {
         setCartItems(response.data.cartData);
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.message);
+      console.error(error);
+      toast.error(error.response?.data?.message || "Error fetching cart");
     }
   };
 

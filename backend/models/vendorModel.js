@@ -34,6 +34,7 @@ const vendorSchema = new mongoose.Schema(
       ref: "user",
       required: true,
     },
+
     storeName: {
       type: String,
       required: true,
@@ -52,11 +53,11 @@ const vendorSchema = new mongoose.Schema(
 
     storeImage: {
       type: String,
-      required: true,
+      required: false,
     },
     storeBanner: {
       type: String,
-      required: true,
+      required: false,
     },
 
     isVerified: {

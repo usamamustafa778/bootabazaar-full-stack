@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Login = () => {
   const [currentState, setCurrentState] = useState("Login");
@@ -10,21 +11,31 @@ const Login = () => {
   const [name, setName] = useState("");
   const [password, setPasword] = useState("");
   const [email, setEmail] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
     try {
       if (currentState === "Sign Up") {
+        if (password !== confirmPassword) {
+          toast.error("Passwords do not match!");
+          return;
+        }
         const response = await axios.post(`${backendUrl}/api/user/register`, {
-          name,
+        name,
           email,
           password,
           role: "user",
         });
         if (response.data.success) {
-          setToken(response.data.token);
-          localStorage.setItem("token", response.data.token);
-          toast.success("Your account is registered successfully.");
+          toast.success("Your account is registered successfully. Please login.");
+          setCurrentState("Login");
+          setName("");
+          setEmail("");
+          setPasword("");
+          setConfirmPassword("");
         } else {
           toast.error(response.data.message);
         }
@@ -55,7 +66,7 @@ const Login = () => {
   }, [token]);
 
   return (
-    <div className="flex items-center justify-center bg-gray-50 mt-24 px-4 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center bg-gray-50 mt-20 px-4 sm:px-6 lg:px-8">
       <div className="flex w-full max-w-5xl shadow-lg rounded-2xl overflow-hidden">
         {/* Left side - Image */}
         <div
@@ -122,15 +133,49 @@ const Login = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
-              <input
-                onChange={(e) => setPasword(e.target.value)}
-                value={password}
-                type="password"
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:border-transparent"
-                placeholder="Enter your password"
-                required
-              />
+              <div className="relative">
+                <input
+                  onChange={(e) => setPasword(e.target.value)}
+                  value={password}
+                  type={showPassword ? "text" : "password"}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:border-transparent"
+                  placeholder="Enter your password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                </button>
+              </div>
             </div>
+
+            {currentState === "Sign Up" && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <input
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    value={confirmPassword}
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:border-transparent"
+                    placeholder="Confirm your password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showConfirmPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center justify-between text-sm">
               <p className="text-gray-600 hover:text-black cursor-pointer">

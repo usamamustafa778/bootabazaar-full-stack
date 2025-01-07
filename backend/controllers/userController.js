@@ -8,11 +8,9 @@ import userModel from "../models/userModel.js";
 const router = express.Router();
 
 const createToken = (id, role, vendorId) => {
-  return jwt.sign(
-    { id, role, vendorId }, // Include additional fields in the payload
-    process.env.JWT_SECRET,
-    { expiresIn: '1h' } // Set an expiration time for security
-  );
+  return jwt.sign({ id, role, vendorId }, process.env.JWT_SECRET, {
+    expiresIn: "1d",
+  });
 };
 
 export const loginUser = expressAsyncHandler(async (req, res) => {
@@ -21,9 +19,7 @@ export const loginUser = expressAsyncHandler(async (req, res) => {
   // Check for user
   const user = await userModel.findOne({ email });
   if (!user) {
-    return res
-      .status(404)
-      .json({ success: false, message: "User not found" });
+    return res.status(404).json({ success: false, message: "User not found" });
   }
 
   // Check password
@@ -34,7 +30,7 @@ export const loginUser = expressAsyncHandler(async (req, res) => {
       .json({ success: false, message: "Invalid credentials" });
   }
 
-  const token = createToken(user._id,user.role, user.vendorId);
+  const token = createToken(user._id, user.role, user.vendorId);
 
   // Respond with user data and token
   res.status(200).json({
@@ -52,12 +48,9 @@ export const loginUser = expressAsyncHandler(async (req, res) => {
   });
 });
 
-
-
 // @desc User Register
 // @route POST /api/auth/register
 // @access Public
-
 
 export const registerUser = expressAsyncHandler(async (req, res) => {
   const { name, email, password, role } = req.body;
@@ -174,36 +167,94 @@ export const profile = expressAsyncHandler(async (req, res) => {
 // @router /api/user/profile
 // @access Private
 
-export const updateProfile = expressAsyncHandler(async (req, res) => {
-  const { _id } = req.user;
+// export const updateProfile = expressAsyncHandler(async (req, res) => {
+//   const { _id } = req.user;
 
-  // First, find if user exists
+//   // First, find if user exists
+//   const user = await userModel.findById(_id);
+
+//   // Check if user exists and password is correct
+//   if (user) {
+//     user.name = req.body.name || user.name;
+//     user.email = req.body.email || user.email;
+//     if (req.body.password) {
+//       user.password = req.body.password;
+//     }
+//     user.address = req.body.address || user.address;
+//     user.phone = req.body.phone || user.phone;
+//     const updateUser = await user.save();
+
+//     return res.json({
+//       _id: user._id,
+//       name: user.name,
+//       email: user.email,
+//       role: user.role,
+//       phone: user.phone,
+//       isActive: user.isActive,
+//       address: user.address,
+//     });
+//   } else {
+//     res.status(401); // Unauthorized status code
+//     throw new Error("User Not Found!");
+//   }
+// });
+
+export const updateProfile = expressAsyncHandler(async (req, res) => {
+  const { _id, name, email, address, phone, role } = req.body;
+
+  // Validate request data
+  if (!_id) {
+    return res.status(400).json({
+      success: false,
+      message: "User ID is required to update the user.",
+    });
+  }
+
+  // Fetch the user by ID
   const user = await userModel.findById(_id);
 
-  // Check if user exists and password is correct
-  if (user) {
-    user.name = req.body.name || user.name;
-    user.email = req.body.email || user.email;
-    if (req.body.password) {
-      user.password = req.body.password;
-    }
-    user.address = req.body.address || user.address;
-    user.phone = req.body.phone || user.phone;
-    const updateUser = await user.save();
-
-    return res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      phone: user.phone,
-      isActive: user.isActive,
-      address: user.address,
+  // Check if the user exists
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "User not found.",
     });
-  } else {
-    res.status(401); // Unauthorized status code
-    throw new Error("User Not Found!");
   }
+
+  // Allow updating only from 'user' to 'vendor'
+  if (role && user.role !== "user" && role === "vendor") {
+    return res.status(400).json({
+      success: false,
+      message: "Role can only be updated from 'user' to 'vendor'.",
+    });
+  }
+
+  // Update user details
+  user.name = name || user.name;
+  user.email = email || user.email;
+  user.address = address || user.address;
+  user.phone = phone || user.phone;
+
+  // Update role if specified
+  if (role === "vendor" && user.role === "user") {
+    user.role = "vendor";
+  }
+
+  // Save the updated user
+  const updatedUser = await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "User updated successfully.",
+    user: {
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      address: updatedUser.address,
+      phone: updatedUser.phone,
+    },
+  });
 });
 
 // @desc get all User Profiles
@@ -220,10 +271,6 @@ export const getAllProfile = expressAsyncHandler(async (req, res) => {
     throw new Error("No users found!");
   }
 });
-
-
-
-
 
 // @desc Delete User Profiles
 // @router /api/user/:id

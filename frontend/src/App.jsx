@@ -67,7 +67,7 @@ const App = () => {
               <UserOrders />
             ) : user?.role === "vendor" ? (
               <VendorDashboard />
-            ) : user?.role === "superadmin" ? (
+            ) : user?.role === "admin" ? (
               <SuperadminDashboard />
             ) : (
               <Login />

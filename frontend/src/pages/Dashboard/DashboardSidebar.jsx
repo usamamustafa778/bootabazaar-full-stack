@@ -8,6 +8,7 @@ import {
   Squares2X2Icon,
   UsersIcon,
 } from "@heroicons/react/20/solid";
+import { FaBox, FaShop } from "react-icons/fa6";
 
 const linkBaseClass =
   "flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-300";
@@ -21,26 +22,49 @@ const navItems = [
     to: "/dashboard",
     label: "Dashboard",
     icon: <Squares2X2Icon className="w-5 h-5" />,
+    roles: ["admin", "vendor"],
   },
   {
     to: "/dashboard/add",
     label: "Add Product",
     icon: <PlusCircleIcon className="w-5 h-5" />,
+    roles: ["vendor"],
   },
   {
     to: "/dashboard/list",
     label: "List Items",
     icon: <ListBulletIcon className="w-5 h-5" />,
+    roles: ["vendor"],
   },
   {
     to: "/dashboard/orders",
     label: "Orders",
     icon: <InboxStackIcon className="w-5 h-5" />,
+    roles: ["vendor"],
   },
   {
     to: "/dashboard/customers",
     label: "Customers",
     icon: <UsersIcon className="w-5 h-5" />,
+    roles: ["vendor"],
+  },
+  {
+    to: "/dashboard/users",
+    label: "Users",
+    icon: <UsersIcon className="w-5 h-5" />,
+    roles: ["admin"],
+  },
+  {
+    to: "/dashboard/stores",
+    label: "Stores",
+    icon: <FaShop className="w-5 h-5" />,
+    roles: ["admin"],
+  },
+  {
+    to: "/dashboard/products",
+    label: "Products",
+    icon: <FaBox className="w-5 h-5" />,
+    roles: ["admin"],
   },
 ];
 
@@ -67,17 +91,21 @@ export default function DashboardSidebar() {
           <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             {user?.name}
           </h1>
-          <p className="font-medium text-gray-700 mt-1">Store Dashboard</p>
+          <p className="font-medium text-gray-700 mt-1">
+            {user?.role === "admin" ? "Admin" : "Store"} Dashboard
+          </p>
           <p className="text-sm text-gray-400 mt-0.5">Welcome back!</p>
         </div>
 
-        {/* Navigation Items */}
-        {navItems.map(({ to, label, icon }) => (
-          <NavLink key={to} to={to} end className={navLinkClass}>
-            {icon}
-            <p className="hidden md:block font-medium">{label}</p>
-          </NavLink>
-        ))}
+        {/* Navigation Items - Updated with role filter */}
+        {navItems
+          .filter((item) => item.roles.includes(user?.role))
+          .map(({ to, label, icon }) => (
+            <NavLink key={to} to={to} end className={navLinkClass}>
+              {icon}
+              <p className="hidden md:block font-medium">{label}</p>
+            </NavLink>
+          ))}
       </div>
 
       {/* Logout Button */}

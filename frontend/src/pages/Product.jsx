@@ -1,31 +1,73 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { ShopContext } from "../context/ShopContext";
-import { assets } from "../assets/assets";
+import { toast } from "react-toastify";
+import axios from "axios";
+import {
+  FaStar,
+  FaRegStar,
+  FaShoppingCart,
+  FaTruck,
+  FaUndo,
+  FaShieldAlt,
+} from "react-icons/fa";
 import RelatedProducts from "../components/RelatedProducts";
-import { FaStar, FaRegStar, FaShoppingCart, FaTruck, FaUndo, FaShieldAlt } from "react-icons/fa";
 
 const Product = () => {
-  const { productId } = useParams();
-  const { products, currency, addToCart } = useContext(ShopContext);
+  const { productSlug } = useParams();
   const [productData, setProductData] = useState(false);
   const [image, setImage] = useState("");
-  const [size, setSize] = useState("");
   const [activeTab, setActiveTab] = useState("description");
 
-  const fetchProductData = async () => {
-    products.map((item) => {
-      if (item._id === productId) {
-        setProductData(item);
-        setImage(item.image[0]);
-        return null;
+  const addToCart = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      toast.error("Please login to add items to cart");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/cart/add",
+        {
+          itemId: productData._id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("Item added to cart successfully");
+      } else {
+        toast.error(response.data.message || "Failed to add item to cart");
       }
-    });
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error(error.response?.data?.message || "Error adding item to cart");
+    }
+  };
+
+  const fetchProductData = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:4000/api/product/slug/${productSlug}`
+      );
+      if (response.data.success) {
+        setProductData(response.data.product);
+        setImage(response.data.product.image[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      toast.error("Error loading product details");
+    }
   };
 
   useEffect(() => {
     fetchProductData();
-  }, [productId, products]);
+  }, [productSlug]);
 
   return productData ? (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -49,7 +91,9 @@ const Product = () => {
                 key={index}
                 onClick={() => setImage(item)}
                 className={`flex-shrink-0 border-2 rounded-lg overflow-hidden transition-all ${
-                  image === item ? "border-green-500" : "border-gray-200 hover:border-gray-300"
+                  image === item
+                    ? "border-green-500"
+                    : "border-gray-200 hover:border-gray-300"
                 }`}
               >
                 <img
@@ -64,22 +108,23 @@ const Product = () => {
 
         {/* Product Info */}
         <div className="flex-1 space-y-6">
-          <h1 className="text-3xl font-bold text-gray-900">{productData.name}</h1>
-          
+          <h1 className="text-3xl font-bold text-gray-900">
+            {productData.name}
+          </h1>
+
           {/* Rating */}
           <div className="flex items-center gap-2">
             <div className="flex text-yellow-400">
-              {[...Array(5)].map((_, index) => (
+              {[...Array(5)].map((_, index) =>
                 index < 4 ? <FaStar key={index} /> : <FaRegStar key={index} />
-              ))}
+              )}
             </div>
             <span className="text-gray-500">(122 reviews)</span>
           </div>
 
           {/* Price */}
           <div className="text-4xl font-bold text-gray-900">
-            {currency}
-            {productData.price}
+            Rs {productData.price}
           </div>
 
           {/* Description */}
@@ -87,35 +132,10 @@ const Product = () => {
             {productData.description}
           </p>
 
-          {/* Size Selection */}
-          <div className="space-y-4">
-            <h3 className="font-medium text-gray-900">Select Size</h3>
-            <div className="flex flex-wrap gap-3">
-              {productData.sizes.map((item, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSize(item)}
-                  className={`px-6 py-2 rounded-lg transition-all ${
-                    item === size
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Add to Cart Button */}
           <button
-            onClick={() => addToCart(productData._id, size)}
-            disabled={!size}
-            className={`w-full py-4 px-8 rounded-lg flex items-center justify-center gap-2 text-white font-medium transition-all ${
-              size
-                ? "bg-green-500 hover:bg-green-600"
-                : "bg-gray-300 cursor-not-allowed"
-            }`}
+            onClick={addToCart}
+            className="w-full py-4 px-8 rounded-lg flex items-center justify-center gap-2 text-white font-medium transition-all bg-green-500 hover:bg-green-600"
           >
             <FaShoppingCart />
             Add to Cart
@@ -165,7 +185,7 @@ const Product = () => {
             Reviews (122)
           </button>
         </div>
-        
+
         <div className="py-8">
           {activeTab === "description" ? (
             <div className="prose max-w-none">
@@ -173,9 +193,9 @@ const Product = () => {
                 {productData.description}
               </p>
               <p className="text-gray-600 leading-relaxed mt-4">
-                Our products are carefully selected to ensure the highest quality
-                and customer satisfaction. Each item undergoes rigorous quality
-                control before being made available for purchase.
+                Our products are carefully selected to ensure the highest
+                quality and customer satisfaction. Each item undergoes rigorous
+                quality control before being made available for purchase.
               </p>
             </div>
           ) : (

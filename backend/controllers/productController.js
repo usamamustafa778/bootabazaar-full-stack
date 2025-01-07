@@ -14,19 +14,16 @@ export const addProduct = async (req, res) => {
       sizes,
       bestseller,
       vendor,
+      stock,
     } = req.body;
 
-    // Add debugging logs
-    console.log("Received vendor ID:", vendor);
-    console.log("Is valid ObjectId?:", mongoose.Types.ObjectId.isValid(vendor));
-
-    // Validate required fields
     if (!vendor || !mongoose.Types.ObjectId.isValid(vendor)) {
       return res.status(400).json({
         success: false,
         message: "Invalid or missing vendor ID",
       });
     }
+
     if (!name || !description) {
       return res.status(400).json({
         success: false,
@@ -34,7 +31,6 @@ export const addProduct = async (req, res) => {
       });
     }
 
-    // Handle images upload
     const image1 = req.files?.image1?.[0];
     const image2 = req.files?.image2?.[0];
     const image3 = req.files?.image3?.[0];
@@ -50,7 +46,6 @@ export const addProduct = async (req, res) => {
       })
     );
 
-    // Generate product data with slug
     const productData = {
       name,
       slug: slugify(name.toLowerCase(), { strict: true }),
@@ -62,28 +57,28 @@ export const addProduct = async (req, res) => {
       sizes: sizes ? JSON.parse(sizes) : [],
       image: imagesUrl,
       vendor,
+      stock: isNaN(Number(stock)) ? 0 : Number(stock),
       date: Date.now(),
     };
 
     const product = new productModel(productData);
     await product.save();
 
-    // Return the added product details in the response
     res.json({
       success: true,
       message: "Product Added",
       product,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// Get A Product By Slug
 export const getAProductBySlug = async (req, res) => {
   try {
-    const product = await productModel.findOne({ slug: req.params.slug });
+    const product = await productModel
+      .findOne({ slug: req.params.slug })
+      .populate("vendor");
     if (!product) {
       return res.status(404).json({
         status: false,
@@ -92,7 +87,6 @@ export const getAProductBySlug = async (req, res) => {
     }
     res.status(200).json({ status: true, product });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: false,
       message: "An error occurred while fetching the product",
@@ -102,7 +96,7 @@ export const getAProductBySlug = async (req, res) => {
 
 export const listProducts = async (req, res) => {
   try {
-    const products = await productModel.find({});
+    const products = await productModel.find({}).populate("vendor");
     if (products.length === 0) {
       return res
         .status(404)
@@ -110,7 +104,6 @@ export const listProducts = async (req, res) => {
     }
     res.json({ success: true, products });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -118,11 +111,8 @@ export const listProducts = async (req, res) => {
 export const removeProduct = async (req, res) => {
   try {
     const { id } = req.body;
-
-    // Find the product by ID
     const product = await productModel.findById(id);
 
-    // If the product is not found, respond with a 404 status
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -130,22 +120,17 @@ export const removeProduct = async (req, res) => {
       });
     }
 
-    // Delete the product
     await productModel.findByIdAndDelete(id);
-
-    // Respond with success
     res.json({ success: true, message: "Product removed successfully" });
   } catch (error) {
-    console.error("Error removing product:", error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// Get Single Product Info
 export const singleProduct = async (req, res) => {
   try {
     const { productId } = req.body;
-    const product = await productModel.findById(productId);
+    const product = await productModel.findById(productId).populate("vendor");
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -154,7 +139,67 @@ export const singleProduct = async (req, res) => {
     }
     res.json({ success: true, product });
   } catch (error) {
-    console.log(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateProduct = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const updateData = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product ID",
+      });
+    }
+
+    // Handle image uploads if any
+    const image1 = req.files?.image1?.[0];
+    const image2 = req.files?.image2?.[0];
+    const image3 = req.files?.image3?.[0];
+    const image4 = req.files?.image4?.[0];
+    const newImages = [image1, image2, image3, image4].filter(Boolean);
+
+    if (newImages.length > 0) {
+      const imagesUrl = await Promise.all(
+        newImages.map(async (item) => {
+          const result = await cloudinary.uploader.upload(item.path, {
+            resource_type: "image",
+          });
+          return result.secure_url;
+        })
+      );
+      updateData.image = imagesUrl;
+    }
+
+    // Update slug if name is being updated
+    if (updateData.name) {
+      updateData.slug = slugify(updateData.name.toLowerCase(), {
+        strict: true,
+      });
+    }
+
+    const product = await productModel.findByIdAndUpdate(
+      productId,
+      updateData,
+      { new: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Product updated successfully",
+      product,
+    });
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };

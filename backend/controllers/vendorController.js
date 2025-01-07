@@ -6,7 +6,7 @@ import { Vendor } from "../models/vendorModel.js";
 // @router /api/vendor/
 // @access private
 
-export const createVendor = expressAsyncHandler(async (req, res) => {
+export const createStore = expressAsyncHandler(async (req, res) => {
   try {
     const newVendor = await Vendor.create(req.body);
     res.status(201).json({ status: true, data: newVendor });

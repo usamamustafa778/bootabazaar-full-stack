@@ -190,7 +190,9 @@ const Collection = () => {
         <div className="flex-1">
           {filterProducts.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500">No products found matching your criteria.</p>
+              <p className="text-gray-500">
+                No products found matching your criteria.
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -198,7 +200,7 @@ const Collection = () => {
                 <ProductItem
                   key={index}
                   name={item.name}
-                  id={item._id}
+                  slug={item.slug}
                   price={item.price}
                   image={item.image}
                 />

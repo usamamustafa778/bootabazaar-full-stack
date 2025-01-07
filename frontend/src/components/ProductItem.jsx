@@ -2,14 +2,14 @@ import React, { useContext } from "react";
 import { ShopContext } from "../context/ShopContext";
 import { Link } from "react-router-dom";
 
-const ProductItem = ({ id, image, name, price }) => {
+const ProductItem = ({ slug, image, name, price }) => {
   const { currency } = useContext(ShopContext);
 
   return (
     <Link
       onClick={() => scrollTo(0, 0)}
       className="group relative block overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-xl transition-all duration-300 ease-in-out"
-      to={`/product/${id}`}
+      to={`/product/${slug}`}
     >
       <div className="relative w-full pb-[100%]">
         <div

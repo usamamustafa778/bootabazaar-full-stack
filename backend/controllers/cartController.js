@@ -1,30 +1,27 @@
 import userModel from "../models/userModel.js";
+import jwt from "jsonwebtoken";
 
 // Add products to user cart
 const addToCart = async (req, res) => {
   try {
     console.log("Add to Cart Request:", req.body);
-    const { userId, itemId, size } = req.body;
+    const { itemId } = req.body;
+    const actualUserId = req.user.id; // Get userId from auth middleware
 
-    const userData = await userModel.findById(userId);
+    const userData = await userModel.findById(actualUserId);
     if (!userData) {
-      console.error("User not found:", userId);
+      console.error("User not found:", actualUserId);
       return res.json({ success: false, message: "User not found" });
     }
 
     let cartData = userData.cartData || {};
+    cartData[itemId] = (cartData[itemId] || 0) + 1;
 
-    if (cartData[itemId]) {
-      if (cartData[itemId][size]) {
-        cartData[itemId][size] += 1;
-      } else {
-        cartData[itemId][size] = 1;
-      }
-    } else {
-      cartData[itemId] = { [size]: 1 };
-    }
-
-    await userModel.findByIdAndUpdate(userId, { cartData }, { new: true });
+    await userModel.findByIdAndUpdate(
+      actualUserId,
+      { cartData },
+      { new: true }
+    );
     res.json({ success: true, message: "Added To Cart" });
   } catch (error) {
     console.error("Error adding to cart:", error);
@@ -36,24 +33,37 @@ const addToCart = async (req, res) => {
 const updateCart = async (req, res) => {
   try {
     console.log("Update Cart Request:", req.body);
-    const { userId, itemId, size, quantity } = req.body;
+    const { userId, itemId, quantity } = req.body;
 
-    const userData = await userModel.findById(userId);
+    // Extract actual userId from JWT token
+    let actualUserId;
+    try {
+      const decoded = jwt.verify(userId, process.env.JWT_SECRET);
+      actualUserId = decoded.id;
+    } catch (error) {
+      return res.json({ success: false, message: "Invalid token" });
+    }
+
+    const userData = await userModel.findById(actualUserId);
     if (!userData) {
-      console.error("User not found:", userId);
+      console.error("User not found:", actualUserId);
       return res.json({ success: false, message: "User not found" });
     }
 
     let cartData = userData.cartData || {};
 
-    if (cartData[itemId] && cartData[itemId][size]) {
-      cartData[itemId][size] = quantity;
-      await userModel.findByIdAndUpdate(userId, { cartData }, { new: true });
+    if (cartData.hasOwnProperty(itemId)) {
+      cartData[itemId] = quantity;
+      await userModel.findByIdAndUpdate(
+        actualUserId,
+        { cartData },
+        { new: true }
+      );
       res.json({ success: true, message: "Cart Updated" });
     } else {
       return res.json({
         success: false,
-        message: "Item or size not found in cart",
+        message: "Item not found in cart",
       });
     }
   } catch (error) {
