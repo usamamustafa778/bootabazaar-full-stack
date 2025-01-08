@@ -75,12 +75,12 @@ const updateCart = async (req, res) => {
 // Get user cart data
 const getUserCart = async (req, res) => {
   try {
-    console.log("Get User Cart Request:", req.body);
-    const { userId } = req.body;
+    console.log("Get User Cart Request");
+    const actualUserId = req.user.id; // Get userId from auth middleware
 
-    const userData = await userModel.findById(userId);
+    const userData = await userModel.findById(actualUserId);
     if (!userData) {
-      console.error("User not found:", userId);
+      console.error("User not found:", actualUserId);
       return res.json({ success: false, message: "User not found" });
     }
 

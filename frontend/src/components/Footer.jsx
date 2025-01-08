@@ -5,7 +5,7 @@ import Container from "./common/Container";
 const Footer = () => {
   return (
     <>
-      <Container className="mx-auto">
+      <Container className="mx-auto p-9">
         <div className="flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10 mt-40">
           <div>
             <img src={assets.logo} className="mb-5 w-48" alt="" />

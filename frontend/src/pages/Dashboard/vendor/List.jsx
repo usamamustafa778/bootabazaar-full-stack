@@ -3,7 +3,9 @@ import React, { useEffect, useState } from "react";
 import { backendUrl, currency } from "../../../App";
 import { toast } from "react-toastify";
 
-export default function List({ token, user }) {
+export default function List() {
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user"));
   const [list, setList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
   const [search, setSearch] = useState("");
@@ -11,14 +13,15 @@ export default function List({ token, user }) {
   const fetchList = async () => {
     try {
       const response = await axios.get(`${backendUrl}/api/product/list`, {
-        headers: { Authorization: `Bearer ${token?.token}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.data.success) {
-        // Adjust vendor property as needed based on API response
         const filteredProducts = response.data.products.filter(
-          (product) => product.vendor === user?.user._id
+          (product) => product.vendor.user === user?._id
         );
+        console.log('Current user ID:', user?._id);
+        console.log('Filtered products:', filteredProducts);
         const reversed = filteredProducts.reverse();
         setList(reversed);
         setFilteredList(reversed);
@@ -79,7 +82,7 @@ export default function List({ token, user }) {
   }, [list]);
 
   return (
-    <div className="p-10 w-full">
+    <div className="p-10 w-full h-screen overflow-y-auto">
       {/* Heading */}
       <h2 className="text-2xl font-bold text-gray-800 mb-4">
         Vendor's Product List

@@ -20,12 +20,10 @@ const orderRouter = express.Router();
 orderRouter.post("/list", adminAuth, allOrders);
 orderRouter.post("/status", adminAuth, updateStatus);
 
-
-
 orderRouter.get(
   "/vendor-orders/:vendorId",
   authUser, // Middleware to verify and attach user to the request
-  roleCheck("vendor"),// Middleware to ensure the user has the "vendor" role
+  roleCheck("vendor"), // Middleware to ensure the user has the "vendor" role
   getVendorOrders // Controller to handle the business logic
 );
 

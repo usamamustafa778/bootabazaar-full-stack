@@ -138,9 +138,9 @@ const Navbar = () => {
           className="relative hover:opacity-70 transition-opacity"
         >
           <img src={assets.cart_icon} className="w-5 min-w-5" alt="" />
-          <p className="absolute right-[-8px] bottom-[-8px] w-5 h-5 flex items-center justify-center bg-black text-white rounded-full text-xs">
+          {/* <p className="absolute right-[-8px] bottom-[-8px] w-5 h-5 flex items-center justify-center bg-black text-white rounded-full text-xs">
             {getCartCount()}
-          </p>
+          </p> */}
         </Link>
         <img
           onClick={() => setVisible(true)}

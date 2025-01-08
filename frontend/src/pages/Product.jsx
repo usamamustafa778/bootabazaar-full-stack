@@ -27,26 +27,27 @@ const Product = () => {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:4000/api/cart/add",
-        {
-          itemId: productData._id,
+      const response = await fetch("http://localhost:4000/api/cart/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+        body: JSON.stringify({
+          itemId: productData._id,
+        }),
+      });
 
-      if (response.data.success) {
+      const data = await response.json();
+
+      if (data.success) {
         toast.success("Item added to cart successfully");
       } else {
-        toast.error(response.data.message || "Failed to add item to cart");
+        toast.error(data.message || "Failed to add item to cart");
       }
     } catch (error) {
       console.error("Error:", error);
-      toast.error(error.response?.data?.message || "Error adding item to cart");
+      toast.error("Error adding item to cart");
     }
   };
 

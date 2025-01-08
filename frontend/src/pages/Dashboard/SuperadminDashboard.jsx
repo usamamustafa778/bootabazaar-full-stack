@@ -15,6 +15,7 @@ import Users from "./admin/Users";
 import Stores from "./admin/Stores";
 import Products from "./admin/Products";
 import Add from "./Add";
+import Orders from "./admin/Orders";
 
 export default function SuperadminDashboard() {
   const token = localStorage.getItem("token");
@@ -155,6 +156,7 @@ export default function SuperadminDashboard() {
         <Route path="products" element={<Products />} />
         <Route path="add" element={<Add />} />
         <Route path="edit/:slug" element={<Add />} />
+        <Route path="orders" element={<Orders />} />
       </Routes>
     </div>
   );

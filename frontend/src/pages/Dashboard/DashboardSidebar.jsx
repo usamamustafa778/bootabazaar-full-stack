@@ -8,7 +8,7 @@ import {
   Squares2X2Icon,
   UsersIcon,
 } from "@heroicons/react/20/solid";
-import { FaBox, FaShop } from "react-icons/fa6";
+import { FaBox, FaBoxesPacking, FaShop } from "react-icons/fa6";
 
 const linkBaseClass =
   "flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-300";
@@ -64,6 +64,12 @@ const navItems = [
     to: "/dashboard/products",
     label: "Products",
     icon: <FaBox className="w-5 h-5" />,
+    roles: ["admin"],
+  },
+  {
+    to: "/dashboard/orders",
+    label: "Orders",
+    icon: <FaBoxesPacking className="w-5 h-5" />,
     roles: ["admin"],
   },
 ];

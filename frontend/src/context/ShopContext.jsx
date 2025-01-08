@@ -131,26 +131,26 @@ const ShopContextProvider = (props) => {
   };
 
   const getUserCart = async (token) => {
-    try {
-      const response = await axios.post(
-        `${backendUrl}/api/cart/get`,
-        {
-          userId: token,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (response.data.success) {
-        setCartItems(response.data.cartData);
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error(error.response?.data?.message || "Error fetching cart");
-    }
+    // try {
+    //   const response = await axios.post(
+    //     `${backendUrl}/api/cart/get`,
+    //     {
+    //       userId: token,
+    //     },
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`,
+    //         "Content-Type": "application/json",
+    //       },
+    //     }
+    //   );
+    //   if (response.data.success) {
+    //     setCartItems(response.data.cartData);
+    //   }
+    // } catch (error) {
+    //   console.error(error);
+    //   toast.error(error.response?.data?.message || "Error fetching cart");
+    // }
   };
 
   useEffect(() => {

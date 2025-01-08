@@ -20,7 +20,7 @@ import VendorDashboard from "./pages/Dashboard/VendorDashboard";
 import SuperadminDashboard from "./pages/Dashboard/SuperadminDashboard";
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
-export const currency = "$";
+export const currency = "Rs.";
 
 const App = () => {
   const user = JSON.parse(localStorage.getItem("user"));
