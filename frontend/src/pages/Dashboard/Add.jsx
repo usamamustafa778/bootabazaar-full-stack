@@ -280,7 +280,7 @@ const Add = () => {
 
         <input
           type="number"
-          placeholder="Price (₹)"
+          placeholder="Price Rs."
           value={price}
           onChange={(e) => setPrice(e.target.value)}
           className="w-full px-3 py-2 border rounded-lg"

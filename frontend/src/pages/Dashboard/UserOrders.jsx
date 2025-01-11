@@ -71,7 +71,7 @@ const UserOrders = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {orderData.map((item, index) => (
+          {orderData?.map((item, index) => (
             <div
               key={index}
               className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow"
@@ -81,7 +81,7 @@ const UserOrders = () => {
                   <div className="w-24 h-24 rounded-md overflow-hidden">
                     <img
                       className="w-full h-full object-cover"
-                      src={item.image[0]}
+                      src={item?.image}
                       alt={item.name}
                     />
                   </div>

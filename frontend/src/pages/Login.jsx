@@ -14,9 +14,11 @@ const Login = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
     try {
       if (currentState === "Sign Up") {
         if (password !== confirmPassword) {
@@ -24,13 +26,15 @@ const Login = () => {
           return;
         }
         const response = await axios.post(`${backendUrl}/api/user/register`, {
-        name,
+          name,
           email,
           password,
           role: "user",
         });
         if (response.data.success) {
-          toast.success("Your account is registered successfully. Please login.");
+          toast.success(
+            "Your account is registered successfully. Please login."
+          );
           setCurrentState("Login");
           setName("");
           setEmail("");
@@ -49,6 +53,13 @@ const Login = () => {
           toast.success("You are logged in.");
           localStorage.setItem("token", response.data.token);
           localStorage.setItem("user", JSON.stringify(response.data.user));
+
+          const userRole = response.data.user.role;
+          if (userRole === "admin" || userRole === "vendor") {
+            navigate("/dashboard");
+          } else {
+            navigate("/");
+          }
         } else {
           toast.error(response.data.message);
         }
@@ -56,6 +67,8 @@ const Login = () => {
     } catch (error) {
       console.log(error);
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -147,7 +160,11 @@ const Login = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                  {showPassword ? (
+                    <FaEyeSlash size={20} />
+                  ) : (
+                    <FaEye size={20} />
+                  )}
                 </button>
               </div>
             </div>
@@ -171,7 +188,11 @@ const Login = () => {
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                   >
-                    {showConfirmPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                    {showConfirmPassword ? (
+                      <FaEyeSlash size={20} />
+                    ) : (
+                      <FaEye size={20} />
+                    )}
                   </button>
                 </div>
               </div>
@@ -195,9 +216,23 @@ const Login = () => {
 
             <button
               type="submit"
-              className="w-full bg-secondary text-white py-3 rounded-lg hover:bg-primary transition-colors duration-200"
+              disabled={isLoading}
+              className="w-full bg-secondary text-white py-3 rounded-lg hover:bg-primary transition-colors duration-200 relative"
             >
-              {currentState === "Login" ? "Sign In" : "Sign Up"}
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin"></div>
+                  <span className="ml-2">
+                    {currentState === "Login"
+                      ? "Signing In"
+                      : "Creating Account"}
+                  </span>
+                </div>
+              ) : currentState === "Login" ? (
+                "Sign In"
+              ) : (
+                "Sign Up"
+              )}
             </button>
           </form>
         </div>
