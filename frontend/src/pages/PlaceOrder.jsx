@@ -14,7 +14,7 @@ const PlaceOrder = () => {
   const [formData, setFormData] = useState(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     return {
-      name: user.firstName ? `${user.firstName} ${user.lastName}` : "",
+      name: user.name || "",
       email: user.email || "",
       phone: user.phone || "",
       address: user.address || "",
@@ -30,16 +30,13 @@ const PlaceOrder = () => {
     if (user) {
       setFormData((prevData) => ({
         ...prevData,
-        firstName: user.firstName || prevData.firstName,
-        lastName: user.lastName || prevData.lastName,
+        name: user.username || prevData.name,
         email: user.email || prevData.email,
         phone: user.phone || prevData.phone,
         address: user.address || prevData.address,
-        street: user.street || prevData.street,
         city: user.city || prevData.city,
         state: user.state || prevData.state,
-        zipcode: user.zipcode || prevData.zipcode,
-        country: user.country || prevData.country,
+        pincode: user.zipcode || prevData.pincode,
       }));
     }
   }, []);
@@ -124,6 +121,7 @@ const PlaceOrder = () => {
           quantity: item.quantity,
           vendorId: item.vendorId,
           image: item.image,
+          slug: item.slug,
         })),
         amount: calculateTotal(),
         address: formData,
@@ -250,7 +248,7 @@ const PlaceOrder = () => {
                 />
                 <InputField
                   name="pincode"
-                  placeholder="PIN Code"
+                  placeholder="Zip Code"
                   value={formData.pincode}
                   onChange={onChangeHandler}
                   required
@@ -289,7 +287,7 @@ const PlaceOrder = () => {
                         <div className="flex items-center justify-end gap-3">
                           <p className="text-gray-500">x{item.quantity}</p>
                           <p className="text-sm font-medium text-gray-900 w-24 text-right">
-                            ₹{(item.price * item.quantity).toFixed(2)}
+                            Rs. {(item.price * item.quantity).toFixed(2)}
                           </p>
                         </div>
                       </div>
@@ -300,7 +298,7 @@ const PlaceOrder = () => {
                   <div className="space-y-2 pt-3">
                     <div className="flex justify-between text-sm text-gray-600">
                       <span>Subtotal</span>
-                      <span>₹{calculateTotal().toFixed(2)}</span>
+                      <span>Rs. {calculateTotal().toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm text-gray-600">
                       <span>Shipping</span>
@@ -308,7 +306,7 @@ const PlaceOrder = () => {
                     </div>
                     <div className="flex justify-between text-base font-semibold border-t pt-3">
                       <span>Total</span>
-                      <span>₹{calculateTotal().toFixed(2)}</span>
+                      <span>Rs. {calculateTotal().toFixed(2)}</span>
                     </div>
                   </div>
                 </div>

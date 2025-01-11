@@ -113,14 +113,24 @@ export default function Orders() {
               All
             </button>
             <button
-              onClick={() => handleStatusFilter('pending')}
+              onClick={() => handleStatusFilter('order placed')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 
-                ${statusFilter === 'pending'
+                ${statusFilter === 'order placed'
                   ? 'bg-yellow-500 text-white'
                   : 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200'
               }`}
             >
-              Pending
+              Order Placed
+            </button>
+            <button
+              onClick={() => handleStatusFilter('processing')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 
+                ${statusFilter === 'processing'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+              }`}
+            >
+              Processing
             </button>
             <button
               onClick={() => handleStatusFilter('shipped')}
@@ -159,12 +169,13 @@ export default function Orders() {
       {/* Orders List */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         {/* Header Row */}
-        <div className="hidden md:grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] gap-4 items-center p-4 bg-gray-50 border-b border-gray-100">
+        <div className="hidden md:grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr_1fr] gap-4 items-center p-4 bg-gray-50 border-b border-gray-100">
           <span className="text-sm font-semibold text-gray-600">ORDER #</span>
           <span className="text-sm font-semibold text-gray-600">CUSTOMER</span>
           <span className="text-sm font-semibold text-gray-600">DATE</span>
           <span className="text-sm font-semibold text-gray-600">TOTAL</span>
           <span className="text-sm font-semibold text-gray-600">STATUS</span>
+          <span className="text-sm font-semibold text-gray-600">PAYMENT</span>
           <span className="text-sm font-semibold text-gray-600">ITEMS</span>
         </div>
 
@@ -186,19 +197,20 @@ export default function Orders() {
             {filteredOrders.map((order) => (
               <div
                 key={order._id}
-                className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] gap-4 items-center p-4 hover:bg-gray-50 transition-colors duration-150"
+                className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr_1fr] gap-4 items-center p-4 hover:bg-gray-50 transition-colors duration-150"
               >
                 <div className="font-medium text-gray-800">
                   #{order._id.slice(-6)}
                 </div>
                 <div className="space-y-1">
                   <div className="font-medium text-gray-800">
-                    {`${order.address?.firstName} ${order.address?.lastName}`}
+                    {order.address?.name}
                   </div>
                   <div className="text-sm text-gray-500">{order.address?.email}</div>
+                  <div className="text-sm text-gray-500">{order.address?.phone}</div>
                 </div>
                 <div className="text-sm text-gray-600">
-                  {order.date ? format(new Date(order.date), 'MMM d, yyyy') : 'N/A'}
+                  {order.date ? format(new Date(parseInt(order.date)), 'MMM d, yyyy') : 'N/A'}
                 </div>
                 <div className="font-medium text-gray-800">
                   Rs. {order.amount?.toFixed(2)}
@@ -210,15 +222,25 @@ export default function Orders() {
                       ? 'bg-green-100 text-green-700'
                       : order.status.toLowerCase() === 'processing'
                         ? 'bg-blue-100 text-blue-700'
-                        : order.status.toLowerCase() === 'pending'
+                        : order.status.toLowerCase() === 'order placed'
                           ? 'bg-yellow-100 text-yellow-700'
-                          : order.status.toLowerCase() === 'shipped'
-                            ? 'bg-blue-100 text-blue-700'
-                            : 'bg-red-100 text-red-700'
+                          : 'bg-red-100 text-red-700'
                     }`}
                   >
                     {order.status}
                   </span>
+                </div>
+                <div>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium 
+                    ${order.payment
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-red-100 text-red-700'
+                    }`}
+                  >
+                    {order.payment ? 'Paid' : 'Pending'}
+                  </span>
+                  <div className="text-xs text-gray-500 mt-1">{order.paymentMethod}</div>
                 </div>
                 <div className="text-sm text-gray-600">
                   {order.items?.length || 0} items
