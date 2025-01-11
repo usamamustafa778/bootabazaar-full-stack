@@ -9,6 +9,8 @@ import {
   verifyStripe,
   verifyRazorpay,
   getVendorOrders,
+  updateTracking,
+  getTracking,
 } from "../controllers/orderController.js";
 import adminAuth from "../middleware/adminAuth.js";
 import authUser from "../middleware/auth.js";
@@ -38,5 +40,9 @@ orderRouter.post("/userorders", authUser, userOrders);
 // verify payment
 orderRouter.post("/verifyStripe", authUser, verifyStripe);
 orderRouter.post("/verifyRazorpay", authUser, verifyRazorpay);
+
+// Tracking routes
+orderRouter.put("/tracking/:orderId", authUser, roleCheck(["admin", "vendor"]), updateTracking);
+orderRouter.get("/tracking/:orderId", authUser, getTracking);
 
 export default orderRouter;

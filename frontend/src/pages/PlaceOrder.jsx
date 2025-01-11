@@ -123,6 +123,7 @@ const PlaceOrder = () => {
           price: item.price,
           quantity: item.quantity,
           vendorId: item.vendorId,
+          image: item.image,
         })),
         amount: calculateTotal(),
         address: formData,

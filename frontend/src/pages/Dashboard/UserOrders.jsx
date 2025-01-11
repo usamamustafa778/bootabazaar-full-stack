@@ -8,6 +8,8 @@ const UserOrders = () => {
   const { backendUrl, token, currency } = useContext(ShopContext);
 
   const [orderData, setorderData] = useState([]);
+  const [trackingInfo, setTrackingInfo] = useState(null);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
 
   const loadOrderData = async () => {
     try {
@@ -28,6 +30,7 @@ const UserOrders = () => {
             item["payment"] = order.payment;
             item["paymentMethod"] = order.paymentMethod;
             item["date"] = order.date;
+            item["orderId"] = order._id;
             allOrdersItem.push(item);
           });
         });
@@ -36,9 +39,85 @@ const UserOrders = () => {
     } catch (error) {}
   };
 
+  const getTracking = async (orderId) => {
+    try {
+      const response = await axios.get(
+        `${backendUrl}/api/order/tracking/${orderId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      if (response.data.success) {
+        setTrackingInfo(response.data.tracking);
+        setSelectedOrderId(orderId);
+      }
+    } catch (error) {
+      console.error("Error fetching tracking info:", error);
+    }
+  };
+
   useEffect(() => {
     loadOrderData();
   }, [token]);
+
+  const TrackingModal = ({ tracking, onClose }) => {
+    if (!tracking) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold">Order Tracking</h3>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="bg-gray-50 p-3 rounded">
+              <p className="font-medium">Current Status: {tracking.status}</p>
+              {tracking.estimatedDelivery && (
+                <p className="text-sm text-gray-600">
+                  Estimated Delivery:{" "}
+                  {new Date(tracking.estimatedDelivery).toLocaleDateString(
+                    "en-US",
+                    {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    }
+                  )}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="font-medium">Tracking History</h4>
+              {tracking.updates
+                .slice()
+                .reverse()
+                .map((update, index) => (
+                  <div
+                    key={index}
+                    className="border-l-2 border-gray-200 pl-4 py-2"
+                  >
+                    <p className="font-medium text-sm">{update.status}</p>
+                    {update.comment && (
+                      <p className="text-sm text-gray-600">{update.comment}</p>
+                    )}
+                    <p className="text-xs text-gray-500">
+                      {new Date(update.timestamp).toLocaleString()}
+                    </p>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -132,7 +211,7 @@ const UserOrders = () => {
                     <p className="text-sm font-medium">{item.status}</p>
                   </div>
                   <button
-                    onClick={loadOrderData}
+                    onClick={() => getTracking(item.orderId)}
                     className="bg-gray-800 text-white px-6 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition-colors"
                   >
                     Track Order
@@ -142,6 +221,16 @@ const UserOrders = () => {
             </div>
           ))}
         </div>
+      )}
+
+      {trackingInfo && (
+        <TrackingModal
+          tracking={trackingInfo}
+          onClose={() => {
+            setTrackingInfo(null);
+            setSelectedOrderId(null);
+          }}
+        />
       )}
     </div>
   );

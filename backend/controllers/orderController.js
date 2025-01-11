@@ -281,6 +281,75 @@ const updateStatus = async (req, res) => {
   }
 };
 
+// Update tracking information
+const updateTracking = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { status, comment, estimatedDelivery } = req.body;
+
+    const order = await orderModel.findById(orderId);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found"
+      });
+    }
+
+    // Add new tracking update
+    order.tracking.updates.push({
+      status,
+      comment,
+      timestamp: new Date()
+    });
+
+    // Update current status and estimated delivery
+    order.tracking.status = status;
+    if (estimatedDelivery) {
+      order.tracking.estimatedDelivery = new Date(estimatedDelivery);
+    }
+
+    await order.save();
+
+    res.json({
+      success: true,
+      message: "Tracking updated successfully",
+      tracking: order.tracking
+    });
+  } catch (error) {
+    console.error("Error updating tracking:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// Get tracking information
+const getTracking = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const order = await orderModel.findById(orderId);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found"
+      });
+    }
+
+    res.json({
+      success: true,
+      tracking: order.tracking
+    });
+  } catch (error) {
+    console.error("Error fetching tracking:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 export {
   verifyRazorpay,
   verifyStripe,
@@ -291,4 +360,6 @@ export {
   userOrders,
   updateStatus,
   getVendorOrders,
+  updateTracking,
+  getTracking,
 };

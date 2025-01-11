@@ -78,18 +78,19 @@ const Cart = () => {
           quantity,
         }),
       });
-      
+
       // Check if the update was successful
       if (response.ok) {
         // Update the local state immediately for better UX
-        setCartItems(prevItems =>
-          prevItems.map(item =>
-            item._id === itemId
-              ? { ...item, quantity: quantity }
-              : item
-          ).filter(item => item.quantity > 0) // Remove items with quantity 0
+        setCartItems(
+          (prevItems) =>
+            prevItems
+              .map((item) =>
+                item._id === itemId ? { ...item, quantity: quantity } : item
+              )
+              .filter((item) => item.quantity > 0) // Remove items with quantity 0
         );
-        
+
         // Then refresh the cart data from server
         fetchCartAndProducts();
       } else {

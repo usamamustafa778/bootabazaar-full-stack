@@ -114,42 +114,93 @@ const Product = () => {
             {productData.name}
           </h1>
 
-          {/* Rating */}
-          <div className="flex items-center gap-2">
-            <div className="flex text-yellow-400">
-              {[...Array(5)].map((_, index) =>
-                index < 4 ? <FaStar key={index} /> : <FaRegStar key={index} />
+          {/* Vendor Information */}
+          <div className="bg-gray-100 p-4 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="font-medium">Sold by:</h3>
+              <span className="text-primary">{productData.vendor.storeName}</span>
+              {productData.vendor.isVerified && (
+                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                  Verified
+                </span>
               )}
             </div>
-            <span className="text-gray-500">(122 reviews)</span>
+            <p className="text-sm text-gray-600">
+              {productData.vendor.storeDescription}
+            </p>
           </div>
 
-          {/* Price */}
-          <div className="text-4xl font-bold text-gray-900">
-            Rs {productData.price}
+          {/* Price and Stock */}
+          <div className="space-y-2">
+            <div className="text-4xl font-bold text-gray-900">
+              Rs {productData.price.toLocaleString()}
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`h-2.5 w-2.5 rounded-full ${
+                productData.stock > 0 ? 'bg-green-500' : 'bg-red-500'
+              }`}></span>
+              <span className="text-sm text-gray-600">
+                {productData.stock > 0 
+                  ? `${productData.stock} in stock` 
+                  : 'Out of stock'}
+              </span>
+            </div>
+          </div>
+
+          {/* Product Details */}
+          <div className="space-y-4">
+            <h3 className="font-medium">Product Details</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="space-y-1">
+                <p className="text-gray-500">Category</p>
+                <p>{productData.category}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-gray-500">Sub Category</p>
+                <p>{productData.subCategory}</p>
+              </div>
+              {productData.sizes?.length > 0 && (
+                <div className="space-y-1">
+                  <p className="text-gray-500">Available Sizes</p>
+                  <p>{productData.sizes.join(', ')}</p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Description */}
-          <p className="text-gray-600 leading-relaxed">
-            {productData.description}
-          </p>
+          <div className="space-y-2">
+            <h3 className="font-medium">Description</h3>
+            <div className="prose prose-sm">
+              {productData.description.split('\r\n').map((line, index) => (
+                <p key={index} className="text-gray-600">
+                  • {line}
+                </p>
+              ))}
+            </div>
+          </div>
 
           {/* Add to Cart Button */}
           <button
             onClick={addToCart}
-            className="w-full py-4 px-8 rounded-lg flex items-center justify-center gap-2 text-white font-medium transition-all bg-secondary hover:bg-primary"
+            disabled={productData.stock === 0}
+            className={`w-full py-4 px-8 rounded-lg flex items-center justify-center gap-2 text-white font-medium transition-all ${
+              productData.stock > 0
+                ? 'bg-secondary hover:bg-primary'
+                : 'bg-gray-400 cursor-not-allowed'
+            }`}
           >
             <FaShoppingCart />
-            Add to Cart
+            {productData.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
           </button>
 
-          {/* Features */}
+          {/* Features/Guarantees */}
           <div className="grid grid-cols-2 gap-4 pt-6 border-t">
             <div className="flex items-center gap-3">
               <FaTruck className="text-gray-400 text-xl" />
               <div>
                 <p className="font-medium">Free Delivery</p>
-                <p className="text-sm text-gray-500">For orders above $50</p>
+                <p className="text-sm text-gray-500">For orders above Rs 5000</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -157,6 +208,13 @@ const Product = () => {
               <div>
                 <p className="font-medium">Easy Returns</p>
                 <p className="text-sm text-gray-500">7 days return policy</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <FaShieldAlt className="text-gray-400 text-xl" />
+              <div>
+                <p className="font-medium">Secure Shopping</p>
+                <p className="text-sm text-gray-500">100% Protected</p>
               </div>
             </div>
           </div>
@@ -184,7 +242,7 @@ const Product = () => {
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
-            Reviews (122)
+            Reviews (0)
           </button>
         </div>
 
