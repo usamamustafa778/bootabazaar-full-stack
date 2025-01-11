@@ -12,15 +12,14 @@ import {
   updateTracking,
   getTracking,
 } from "../controllers/orderController.js";
-import adminAuth from "../middleware/adminAuth.js";
 import authUser from "../middleware/auth.js";
 import roleCheck from "../middleware/roleCheck.js";
 
 const orderRouter = express.Router();
 
 // Admin Features
-orderRouter.post("/list", adminAuth, allOrders);
-orderRouter.post("/status", adminAuth, updateStatus);
+orderRouter.post("/list", authUser, roleCheck('admin'), allOrders);
+orderRouter.post("/status", authUser, roleCheck('admin'), updateStatus);
 
 orderRouter.get(
   "/vendor-orders/:vendorId",
@@ -42,7 +41,7 @@ orderRouter.post("/verifyStripe", authUser, verifyStripe);
 orderRouter.post("/verifyRazorpay", authUser, verifyRazorpay);
 
 // Tracking routes
-orderRouter.put("/tracking/:orderId", authUser, roleCheck(["admin", "vendor"]), updateTracking);
+orderRouter.put("/tracking/:orderId", authUser, roleCheck('admin'), updateTracking);
 orderRouter.get("/tracking/:orderId", authUser, getTracking);
 
 export default orderRouter;

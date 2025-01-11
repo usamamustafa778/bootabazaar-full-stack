@@ -2,6 +2,7 @@ import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import Stripe from "stripe";
 import razorpay from "razorpay";
+import mongoose from "mongoose";
 
 // global variables
 const currency = "inr";
@@ -182,8 +183,6 @@ const allOrders = async (req, res) => {
   }
 };
 
-
-
 const getVendorOrders = async (req, res) => {
   try {
     const { id, role } = req.user; // Extract id and role from req.user
@@ -192,12 +191,15 @@ const getVendorOrders = async (req, res) => {
     if (role !== "vendor") {
       return res.status(403).json({
         success: false,
-        message: "Access Denied. You do not have permission to view these orders.",
+        message:
+          "Access Denied. You do not have permission to view these orders.",
       });
     }
 
     // Fetch orders where the vendor's ID matches items.vendorId
-    const orders = await orderModel.find({ "items.vendor": id }).sort({ date: -1 });
+    const orders = await orderModel
+      .find({ "items.vendor": id })
+      .sort({ date: -1 });
 
     if (orders.length === 0) {
       return res.status(200).json({
@@ -221,11 +223,6 @@ const getVendorOrders = async (req, res) => {
     });
   }
 };
-
-
-
-
-
 
 const userOrders = async (req, res) => {
   try {
@@ -266,60 +263,119 @@ const userOrders = async (req, res) => {
   }
 };
 
-
-
 // update order status from Admin Panel
 const updateStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
+    
+    // Validate the status
+    const validStatuses = ['order placed', 'processing', 'shipped', 'completed', 'cancelled'];
+    if (!validStatuses.includes(status.toLowerCase())) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status value"
+      });
+    }
 
-    await orderModel.findByIdAndUpdate(orderId, { status });
-    res.json({ success: true, message: "Status Updated" });
-  } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
-  }
-};
+    // Update the order
+    const updatedOrder = await orderModel.findByIdAndUpdate(
+      orderId,
+      { 
+        status,
+        'tracking.status': status,
+        $push: {
+          'tracking.updates': {
+            status,
+            timestamp: new Date(),
+            comment: `Order status updated to ${status}`
+          }
+        }
+      },
+      { new: true }
+    );
 
-// Update tracking information
-const updateTracking = async (req, res) => {
-  try {
-    const { orderId } = req.params;
-    const { status, comment, estimatedDelivery } = req.body;
-
-    const order = await orderModel.findById(orderId);
-    if (!order) {
+    if (!updatedOrder) {
       return res.status(404).json({
         success: false,
         message: "Order not found"
       });
     }
 
-    // Add new tracking update
-    order.tracking.updates.push({
-      status,
-      comment,
-      timestamp: new Date()
+    res.json({ 
+      success: true, 
+      message: "Status Updated",
+      order: updatedOrder
     });
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message 
+    });
+  }
+};
 
-    // Update current status and estimated delivery
-    order.tracking.status = status;
-    if (estimatedDelivery) {
-      order.tracking.estimatedDelivery = new Date(estimatedDelivery);
+// Update tracking information
+const updateTracking = async (req, res) => {
+  try {
+    console.log('=== UpdateTracking controller ===');
+    console.log('User from request:', req.user);
+    console.log('Request params:', req.params);
+    console.log('Request body:', req.body);
+    
+    const { orderId } = req.params;
+    const { status, comment, estimatedDelivery } = req.body;
+
+    // Validate orderId
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid order ID format",
+      });
     }
 
-    await order.save();
+    const order = await orderModel.findById(orderId);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    // Add new tracking update
+    const trackingUpdate = {
+      status,
+      comment,
+      timestamp: new Date(),
+    };
+
+    const updatedOrder = await orderModel.findByIdAndUpdate(
+      orderId,
+      {
+        $set: {
+          'tracking.status': status,
+          'tracking.estimatedDelivery': estimatedDelivery ? new Date(estimatedDelivery) : undefined,
+          status: status.toLowerCase()
+        },
+        $push: {
+          'tracking.updates': trackingUpdate
+        }
+      },
+      { new: true }
+    );
+
+    console.log('Order updated successfully:', updatedOrder);
 
     res.json({
       success: true,
       message: "Tracking updated successfully",
-      tracking: order.tracking
+      order: updatedOrder
     });
   } catch (error) {
-    console.error("Error updating tracking:", error);
+    console.error('UpdateTracking error:', error);
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message || "Failed to update tracking information"
     });
   }
 };
@@ -333,19 +389,19 @@ const getTracking = async (req, res) => {
     if (!order) {
       return res.status(404).json({
         success: false,
-        message: "Order not found"
+        message: "Order not found",
       });
     }
 
     res.json({
       success: true,
-      tracking: order.tracking
+      tracking: order.tracking,
     });
   } catch (error) {
     console.error("Error fetching tracking:", error);
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
