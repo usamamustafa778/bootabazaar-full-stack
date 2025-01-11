@@ -32,17 +32,8 @@ const addToCart = async (req, res) => {
 // Update user cart
 const updateCart = async (req, res) => {
   try {
-    console.log("Update Cart Request:", req.body);
-    const { userId, itemId, quantity } = req.body;
-
-    // Extract actual userId from JWT token
-    let actualUserId;
-    try {
-      const decoded = jwt.verify(userId, process.env.JWT_SECRET);
-      actualUserId = decoded.id;
-    } catch (error) {
-      return res.json({ success: false, message: "Invalid token" });
-    }
+    const { itemId, quantity } = req.body;
+    const actualUserId = req.user.id; // Get userId from auth middleware, just like addToCart
 
     const userData = await userModel.findById(actualUserId);
     if (!userData) {
